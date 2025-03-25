@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 title: "Untitled"
 format: html
@@ -11,3 +12,17 @@ x
 Medha was here :0 
 
 ```
+=======
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+```{r}
+x= 4+5
+x
+y= 5+5
+y
+```
+>>>>>>> 79a5d6e24216db245c20d58eb108932327fb537c

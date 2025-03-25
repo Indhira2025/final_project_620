@@ -7,5 +7,6 @@ editor: visual
 ```{r}
 x= 4+5
 x
-
+y= 5+5
+y
 ```

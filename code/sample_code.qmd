@@ -1,0 +1,10 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+```{r}
+x= 6+10
+x
+```

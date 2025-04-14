@@ -1,0 +1,102 @@
+`---
+title: "isha_task_2dataset"
+format: html
+editor: visual
+---
+## Data 
+```{r}
+source("./data_code/funcs.R")
+deaths_url <- "https://data.cdc.gov/resource/r8kw-7aab.json"
+
+deaths_raw <- get_cdc_data(deaths_url)
+
+population <- read.csv("data_code/pop_est2020_2024.csv") %>% select(c(NAME, POPESTIMATE2020, POPESTIMATE2021, POPESTIMATE2022,POPESTIMATE2023, POPESTIMATE2024)) %>% rename(state = NAME, pop_2020 = POPESTIMATE2020, pop_2021 = POPESTIMATE2021,pop_2022 = POPESTIMATE2022, pop_2023 = POPESTIMATE2023, pop_2024 = POPESTIMATE2024)
+```
+
+#Pre-Processing and Data Exploration 
+```{r}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+
+covid_deaths <- deaths_raw %>%
+  mutate(week_ending_date = as.Date(week_ending_date),
+         start_date = as.Date(start_date),
+         end_date = as.Date(end_date)) %>% select(-c(data_as_of, pneumonia_deaths, pneumonia_and_covid_19_deaths, influenza_deaths, pneumonia_influenza_or_covid_19_deaths, footnote)) %>%
+  filter(group == "By Week") %>%
+  filter(!is.na(total_deaths)) 
+
+covid_deaths1 <- covid_deaths %>% filter(!state %in% c("United States", "Puerto Rico", "District of Columbia", "New York City"),!is.na(covid_19_deaths)) %>% select(-c(group, month))
+
+population1 <- population %>% filter(state %in% covid_deaths1$state)
+```
+
+## Expected Weekly Deaths - Average 
+```{r}
+excess_death <- covid_deaths1 %>% mutate(mmwr_week = as.integer(mmwr_week), total_deaths = as.numeric(total_deaths), covid_19_deaths = as.numeric(covid_19_deaths), percent_of_expected_deaths = as.numeric(percent_of_expected_deaths)) %>% 
+  left_join(expected_deaths, by = c("state", "mmwr_week")) %>%
+  mutate(expected_deaths = total_deaths/(percent_of_expected_deaths/100), excess_deaths = total_deaths - expected_deaths, percent_change = excess_deaths/expected_deaths) %>% filter(!is.na(total_deaths), !is.na(expected_deaths))
+
+excess_death
+```
+
+## Data Visualizations 
+### Excess Death Over Time/State 
+```{r}
+ggplot(excess_death, aes(x = week_ending_date, y = percent_change)) + geom_line() + labs(title = "Excess Deaths Over Time", y = "% Change in Deaths", x = "Week Ending") + facet_wrap(~state) 
+
+ggplot(excess_death, aes(x = week_ending_date, y = percent_change, color = state)) + geom_line() + labs(title = "Excess Deaths Over Time", y = "% Change in Deaths", x = "Week Ending") +  geom_smooth(se = FALSE, method = "loess", span = 0.3, color = "black")
+```
+
+
+```{r}
+mean_excess_yr <- excess_death %>% mutate( mmwr_year = epiyear(week_ending_date)) %>% group_by(mmwr_year, state) %>% summarize(mean_excess_yr = mean(excess_deaths), mean_percent_change = mean(excess_deaths)/mean(expected_deaths), .groups = "drop") 
+
+top_5_yr <- mean_excess_yr %>% group_by(mmwr_year) %>% slice_max(mean_percent_change, n = 5, with_ties = FALSE) %>% ungroup() %>% count(state, name = "years_in_top5") %>% arrange(desc(years_in_top5))
+
+top_5_yr
+
+ggplot(excess_death %>% filter(state %in% top_5_yr$state[1:10]), aes(x = week_ending_date, y = percent_change, color = state)) + geom_line() +  geom_smooth(se = FALSE, method = "loess", span = 0.3, color = "black") + labs(title = "Excess Deaths Over Time", y = "Excess Deaths", x = "Week Ending") 
+
+```
+
+### Observed vs Expected Deaths and Linear Trend
+```{r}
+ggplot(excess_death, aes(x = expected_deaths, y= total_deaths)) + geom_point() + labs(x = "Expected Deaths", y = "Observed Deaths", title = "Observed vs Expected Deaths") + geom_smooth(method = "lm", se = FALSE, color = "blue")
+
+obs_exp <- summary(lm(total_deaths ~ expected_deaths, data = excess_death))
+obs_exp
+
+#how much did the covid deaths account for excess deaths 
+
+ggplot(excess_death, aes(x=covid_19_deaths, y = excess_deaths)) + geom_point() + geom_smooth(method = "lm", se = FALSE, color = "blue") 
+
+covid_excess_death <- summary(lm(excess_deaths ~ covid_19_deaths, data = excess_death))
+covid_excess_death
+
+# by state 
+ggplot(excess_death %>% group_by(state) %>% summarize(mean_covid_19 = mean(covid_19_deaths), mean_excess = mean(excess_deaths)), aes(x=mean_covid_19, y = mean_excess, label = state)) + geom_point() + geom_smooth(method = "lm", se = FALSE, color = "blue") 
+```
+
+```{r}
+lower_5_year <- mean_excess_yr %>% group_by(mmwr_year) %>% slice_min(mean_percent_change, n = 5, with_ties = FALSE) %>% ungroup() %>% count(state, name = "years_in_low5") %>% arrange(desc(years_in_low5))
+
+lower_5_year %>% ggplot(aes(x=state, y = years_in_low5))+geom_col(fill = "steelblue") + labs(title = "States Most Often with the Lowest Percent Change in Deaths", x = "State", y = "Number of Years in Bottom 5") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+state_trends <- mean_excess_yr %>%
+  group_by(state) %>%
+  summarize(change = last(mean_percent_change) - first(mean_percent_change)) %>%
+  arrange(desc(change))
+
+state_trends %>% filter(change == max(change)) #worsening
+state_trends %>% filter(change == min(change))
+ # improving
+
+
+excess_death %>% filter(state %in% c("Montana", "Oregon")) %>% ggplot(aes(x = week_ending_date, y = percent_change, color = state)) + geom_line()
+```
+
+```{r}
+
+
+```

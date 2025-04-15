@@ -6,16 +6,210 @@ editor: visual
 ---
 
 ```{r}
-#trying branch pushing 
+library(jsonlite)
+library(httr2) 
+library(dplyr)
+library(tidyverse)
+library(janitor)
 
-#Medha was here :0 
+#census key 
+#source("./Code/census-key.R")
+census_key <- "c592b740617a01ddf9775d40d9c5e07dc3279994"
+url <- "https://api.census.gov/data/2021/pep/population"
+
+#request and response created for population data
+request <- request(url) |>
+  req_url_query(
+    get = "POP_2020,POP_2021,NAME",
+    `for` = "state:*", 
+    key = census_key
+  )
+response <- req_perform(request) 
+
+#creating the population data set
+population <- resp_body_json(response, simplifyVector = TRUE)
+
+#wrangling the population data set
+population <- population |> row_to_names(row_number = 1) |> as_tibble() |> select(-state) |> 
+  rename(state_name = NAME) |> 
+  pivot_longer(cols = starts_with("POP_"), names_to = "year", values_to = "population") |> 
+  mutate(year = str_remove(year, "POP_")) |> 
+  mutate(year = as.numeric(year), population = as.numeric(population)) |>
+  mutate(state = state.abb[match(state_name, state.name)]) |> 
+  mutate(state = case_when(
+    state_name == "Puerto Rico" ~ "PR",
+    state_name == "District of Columbia" ~ "DC",
+    TRUE ~ state )) 
+#head(population)
+
+#regions data read in 
+url <- "https://github.com/datasciencelabs/2024/raw/refs/heads/main/data/regions.json"
+regions <- fromJSON(url) |> unnest(states) |> as.data.frame() |> 
+  mutate(region_name = case_when(
+    region_name == "New York and New Jersey, Puerto Rico, Virgin Islands" ~ "NY, NY, PR, VI",
+    TRUE ~ region_name
+  ),
+  region = as.factor(unlist(region))) |> rename(state_name = states)
+#head(regions)
+
+#merging population and regions data by state
+population <- population |> left_join(regions, by = "state_name")
+
+head(population)
+
 ```
 
-You can add options to executable code like this
+2.  In the previous problem set we wrote the following script to download cases data:
 
 ```{r}
-#| echo: false
-2 * 2
+#| eval: false
+api <- "https://data.cdc.gov/resource/pwn4-m3yp.json"
+cases_response <- request(api) |> 
+  req_url_query("$limit" = 10000000) |>
+  req_perform() 
+saveRDS(cases_response, 'cases_response.rds')
+cases_raw <- cases_response |> 
+  resp_body_json(simplifyVector = TRUE)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+We are now going to download three other datasets from CDC that provide hospitalization, provisional COVID deaths, and vaccine data. A different endpoint is provided for each one, but the requests are the same otherwise. To avoid rewriting the same code more than once, write a function called `get_cdc_data` that receives and endpoint and returns a data frame. Save this code in a file called `funcs.R`.
+
+3.  Use `get_cdc_data` to download the cases, hospitalization, deaths, and vaccination data and save the data frames. We recommend saving them into objects called: `cases_raw`, `hosp_raw`, `deaths_raw`, and `vax_raw`.
+
+-   cases - `https://data.cdc.gov/resource/pwn4-m3yp.json`
+-   hospitalizations - `https://data.cdc.gov/resource/39z2-9zu6.json`
+-   deaths - `https://data.cdc.gov/resource/r8kw-7aab.json`
+-   vaccinations `https://data.cdc.gov/resource/rh2h-3yt2.json`
+
+We recommend saving them into objects called: `cases_raw`, `hosp_raw`, `deaths_raw`, and `vax_raw`.
+
+```{r}
+source("./code/funcs.R") 
+cases_raw <- get_cdc_data("https://data.cdc.gov/resource/pwn4-m3yp.json")
+saveRDS(cases_raw, 'cases_raw.rds')
+hosp_raw <- get_cdc_data("https://data.cdc.gov/resource/39z2-9zu6.json")
+saveRDS(hosp_raw, 'hosp_raw.rds')
+deaths_raw <- get_cdc_data("https://data.cdc.gov/resource/r8kw-7aab.json")
+saveRDS(deaths_raw, 'deaths_raw.rds')
+vax_raw <- get_cdc_data("https://data.cdc.gov/resource/rh2h-3yt2.json")
+saveRDS(vax_raw, 'vax_raw.rds')
+
+```
+
+Take a look at all the dataframes you just read in.
+
+```{r}
+print(head(cases_raw))
+print(head(hosp_raw))
+print(head(deaths_raw))
+print(head(vax_raw))
+```
+
+## Wrangling Challenge
+
+In this section, you will wrangle the files downloaded in the previous step into a single data frame containing all the necessary information. We recommend using the following column names: `date`, `state`, `cases`, `hosp`, `deaths`, `vax`, `booster`, and `population`.
+
+### Key Considerations {.unnumbered}
+
+-   **Align reporting periods**: Ensure that the time periods for which each outcome is reported are consistent. Specifically, calculate the totals for each Morbidity and Mortality Weekly Report (MMWR) period.
+
+-   **Harmonize variable names**: To facilitate the joining of datasets, rename variables so that they match across all datasets.
+
+4.  One challenge is data frames use different column names to represent the same variable. Examine each data frame and report back 1) the name of the column with state abbreviations, 2) if the rate is yearly, monthly, or weekly, daily data, 3) all the column names that provide date information.
+
+| Outcome | Jurisdiction variable name | Rate | time variable names |
+|----------------|----------------|--------------------|---------------------|
+| cases | state | weekly | start_date, end_date (optional), date_updated (optional) |
+| hospitalizations | jurisdiction | daily | collection_date |
+| deaths | state | weekly | year, mmwr_week |
+| vaccines | location | daily | date |
+
+Note: there are multiple possible correct answers. We do not list them all here.
+
+5.  Wrangle the cases data frame to keep state, MMWR year, MMWR week, and the total number of cases for that week in that state. Hint: Use `as_date`, `ymd_hms`, `epiweek` and `epiyear` functions in the **lubridate** package. Comment appropriately. Display the result.
+
+```{r}
+library(lubridate)
+cases_raw <- cases_raw |> select(state, start_date, cases = new_cases) |>
+  mutate(week = epiweek(start_date), year = epiyear(start_date))|> 
+  mutate(cases = as.integer(cases)) |> select(-start_date)
+head(cases_raw)
+```
+
+6.  Now repeat the same exercise for hospitalizations. Note that you will have to collapse the data into weekly data and keep the same columns as in the cases dataset, except keep total weekly hospitalizations instead of cases. Remove weeks with less than 7 days reporting. Display your result and comment appropriately.
+
+```{r}
+library(lubridate)
+hosp_raw <- hosp_raw |> select(jurisdiction, collection_date, hosp = new_covid_19_hospital) |>
+  mutate(week = epiweek(collection_date), year = epiyear(collection_date))|> 
+  mutate(hosp = as.integer(hosp)) |> select(-collection_date)|>
+  group_by(jurisdiction, week, year) |>
+  summarise(hosp = sum(hosp))  |> ungroup()
+head(hosp_raw)
+```
+
+7.  Repeat what you did in the previous two exercises for provisional COVID-19 deaths. Display the result and comment appropriately.
+
+```{r}
+deaths_raw <- deaths_raw |> select(state, year, week = mmwr_week, deaths = covid_19_deaths) |>
+  mutate(year = case_when(str_detect(year, '/') ~ 
+           str_extract(year, "(?<=/)[0-9]+"), # if year contains /, e.g. 2019/2020, then only keep after the /
+         TRUE ~ year)) |> mutate(year = as.numeric(year))  |> 
+  mutate(week = as.numeric(week))
+print(head(deaths_raw))
+```
+
+8.  Repeat this now for vaccination data. Keep the variables `series_complete` and `booster` along with state and date. Display the result and comment appropriately. Hint: only use the rows with `date_type == 'Admin'` to only include vaccine data based on the day it was administered, rather than reported.
+
+```{r}
+vax_raw <- vax_raw |> filter(date_type == 'Admin') |>
+  select(location, date, booster = booster_cumulative, series = series_complete_cumulative) |>
+  mutate(week = epiweek(date), year = epiyear(date))|> 
+  mutate(booster = as.integer(booster), series = as.integer(series)) |> select(-date) |> 
+  group_by(location, week, year) |>
+  summarise(booster = max(booster), series = max(series))  |> ungroup()
+head(vax_raw)
+```
+
+9.  Now we are ready to join the tables. We will only consider 2020 and 2021 as we don't have population sizes for 2022. However, because we want to guarantee that all dates are included we will create a data frame with all possible weeks. We can use this:
+
+```{r}
+## Make dates data frame
+all_dates <- data.frame(date = seq(make_date(2020, 1, 25),
+                                   make_date(2021, 12, 31), 
+                                   by = "week")) |>
+  mutate(date = ceiling_date(date, unit = "week", week_start = 7) - days(1)) |>
+  mutate(mmwr_year = epiyear(date), mmwr_week = epiweek(date)) 
+
+#Uncomment to run
+dates_and_pop <- cross_join(all_dates, data.frame(state = unique(population$state))) |> left_join(population, by = c("state", "mmwr_year" = "year"))
+```
+
+Now join all the tables to create your final table. Make sure it is ordered by date within each state. Call it `dat`. Show a few rows here.
+
+```{r}
+dat <- dates_and_pop |> left_join(cases_raw,
+                           by = c("mmwr_year" = "year", 
+                                  "mmwr_week" = "week", "state")) |>
+  mutate(cases = replace_na(cases, 0))
+dat <- dat |> left_join(hosp_raw,
+                           by = c("mmwr_year" = "year", 
+                                  "mmwr_week" = "week", 
+                                  "state" =  "jurisdiction")) |>
+  mutate(hosp = replace_na(hosp, 0))
+dat <- dat |> left_join(vax_raw,
+                           by = c("mmwr_year" = "year", 
+                                  "mmwr_week" = "week", 
+                                  "state" =  "location")) |>
+  mutate(across(c(booster, series), .fns = ~ replace_na(.x, 0)))
+dat <- dat |> left_join(deaths_raw,
+                           by = c("mmwr_year" = "year", 
+                                  "mmwr_week" = "week", 
+                                  "state_name" =  "state")) |>
+  mutate(deaths = as.numeric(deaths)) |>
+  mutate(deaths = replace_na(deaths, 0))
+
+dat <- dat |> arrange(state, date)
+
+head(dat)
+```

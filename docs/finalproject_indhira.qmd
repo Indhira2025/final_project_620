@@ -4,6 +4,8 @@ format: html
 editor: visual
 ---
 
+getwd()
+
 ```{r}
 
 
@@ -16,6 +18,7 @@ library(scales)
 library(knitr)
 library(tidyverse)
 
+getwd()
 
 ##Retreving Data from cdc Website for covid cases, deaths, hospitalizations and ##vaccines
 
@@ -51,8 +54,9 @@ deaths_clean <- deaths_raw %>%
     start_date = as_date(start_date),
     covid_19_deaths = as.numeric(covid_19_deaths),
     mmwr_year = epiyear(start_date),
+    mmwr_week = epiweek(start_date),
   )%>%
-  select(start_date, state, mmwr_year, covid_19_deaths) %>%
+  select(start_date, state, mmwr_year, mmwr_week, covid_19_deaths) %>%
   filter(start_date > as.Date("2020-01-01")) %>%
   arrange(state, mmwr_year)  
 print(head(deaths_clean))
@@ -69,11 +73,11 @@ us_deaths_daily <- deaths_clean %>%
 
 # Plot
 plot1 <- ggplot(us_deaths_daily, aes(x = start_date)) +
-  geom_col(aes(y = total_deaths), fill = "lightgray", alpha = 0.7) +
+  geom_col(aes(y = total_deaths), fill = "red", alpha = 0.8) +
   geom_line(aes(y = rolling_avg_7day), color = "darkred", size = 1) +
   labs(
     title = "Daily COVID-19 Deaths in the US",
-    subtitle = "With 7-Day Rolling Average",
+    subtitle = "With 10-Day Rolling Average",
     x = "Date",
     y = "Number of Deaths"
   ) +
@@ -81,10 +85,10 @@ plot1 <- ggplot(us_deaths_daily, aes(x = start_date)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   scale_x_date(date_breaks = "6 months",date_labels = "%b %Y")+
   scale_y_continuous(limits = c(0, 150000), labels = scales::label_comma())
+plot1
 
-
-ggsave("Covid deaths in US (2020-2025).pdf", plot= plot1, width = 12, height = 8)
-ggsave("Covid deaths in US (2020-2025).png", plot = plot1, width = 12, height = 8, dpi = 300)
+ggsave("new/Covid deaths in US (2020-2025).pdf", plot= plot1, width = 12, height = 8)
+ggsave("new/Covid deaths in US (2020-2025).png", plot = plot1, width = 12, height = 8, dpi = 300)
 
 
 ```
@@ -99,25 +103,25 @@ library(lubridate)
 
 variant_waves <- tibble::tibble(
   start = as_date(c("2020-03-01", "2021-01-01", "2021-07-01", "2021-12-01", "2022-04-01", "2023-06-15")),
-  end   = as_date(c("2021-02-28", "2021-06-30", "2021-11-30", "2022-03-31", "2023-06-14", "2024-03-31")),
+  end   = as_date(c("2021-02-28", "2021-06-30", "2021-10-30", "2022-03-31", "2023-06-14", "2024-03-31")),
   variant = c("1st Wave: Original", 
               "2nd Wave: Alpha", 
               "3rd Wave: Delta", 
               "4th Wave: Omicron BA.1", 
-              "5th Wave: Omicron BA.2 → BA.5 → XBB",
+              "5th Wave: Omicron Other",
               "6th Wave: XBB")
 )
 
 # Plot2: Covid deaths with variant overlay by state
-plot2 <- ggplot(us_deaths_weekly, aes(x = start_date, y = total_deaths)) +
+plot2 <- ggplot(us_deaths_daily, aes(x = start_date, y = total_deaths)) +
   geom_rect(
     data = variant_waves,
     aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf, fill = variant),
     inherit.aes = FALSE,
     alpha = 0.2
   ) +
-  geom_line(color = "darkred", size = 1) +
-  scale_x_date(date_labels = "%b/%Y", date_breaks = "3 months") +
+  geom_line(aes(y = rolling_avg_7day), color = "darkred", size = 1) +
+  scale_x_date(date_labels = "%b/%Y", date_breaks = "6 months") +
   labs(
     title = "US Weekly COVID-19 Deaths with Variant Waves (2020–2025)",
     x = "Month/Year",
@@ -125,10 +129,11 @@ plot2 <- ggplot(us_deaths_weekly, aes(x = start_date, y = total_deaths)) +
     fill = "Variant Waves"
   ) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous(limits = c(0, 150000), labels = scales::label_comma())
 
-ggsave("docs/Covid deaths with variant overlay by state.pdf", plot= plot2, width = 12, height = 8)
-ggsave("docs/Covid deaths with variant overlay by state.png", plot = plot2, width = 12, height = 8, dpi = 300)
+ggsave("new/Covid deaths with variant overlay by state.pdf", plot= plot2, width = 12, height = 8)
+ggsave("new/Covid deaths with variant overlay by state.png", plot = plot2, width = 12, height = 8, dpi = 300)
 ```
 
 Compare COVID-19 death trends by state over time using small multiples (facets).
@@ -150,8 +155,8 @@ plot3 <-deaths_clean %>%
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggsave("docs/COVID-19 Deaths by State.pdf", plot= plot3, width = 12, height = 8)
-ggsave("docs/COVID-19 Deaths by State.png", plot = plot3, width = 12, height = 8, dpi = 300)
+#ggsave("new/COVID-19 Deaths by State.pdf", plot= plot3, width = 12, height = 8)
+#ggsave("new/COVID-19 Deaths by State.png", plot = plot3, width = 12, height = 8, dpi = 300)
 
 ```
 
@@ -189,8 +194,8 @@ plot4 <- ggplot(deaths_quarterly, aes(x = quarter, y = state, fill = total_death
     axis.text.y = element_text(size = 6)
   )
   
-ggsave("docs/COVID-19 Deaths by State (Quarterly).pdf", plot= plot4, width = 12, height = 8)
-ggsave("docs/COVID-19 Deaths by State (Quarterly).png", plot = plot4, width = 12, height = 8, dpi = 300)
+ggsave("new/COVID-19 Deaths by State (Quarterly).pdf", plot= plot4, width = 12, height = 8)
+ggsave("new/COVID-19 Deaths by State (Quarterly).png", plot = plot4, width = 12, height = 8, dpi = 300)
 
 ```
 
@@ -274,10 +279,20 @@ all_dates <- data.frame(date = seq(make_date(2020, 1, 25),
 colnames(cleaned_population)
 dates_and_pop <- cross_join(all_dates, data.frame(state = unique(cleaned_population$state))) |> left_join(cleaned_population, by = c("state", "mmwr_year" = "Year"))
 head(dates_and_pop)
+colnames(deaths_clean)
+us_deaths_weekly <- deaths_clean %>%
+  rename(state_name= "state")%>%
+  group_by(state_name, mmwr_week, mmwr_year) %>%
+  summarise(total_deaths = sum(covid_19_deaths, na.rm = TRUE), .groups = "drop") %>%
+  arrange(state_name, mmwr_week)
+
 datdeaths <- dates_and_pop %>%
-  left_join(deaths_clean, by = c("state", "mmwr_year", "mmwr_week"))  %>%
+  left_join(us_deaths_weekly, by = c("state_name", "mmwr_year", "mmwr_week"))  %>%
   arrange(state, date)
 head(datdeaths)
+#View(datdeaths)
+colnames(datdeaths)
+
 
 ```
 
@@ -290,22 +305,56 @@ head(datdeaths)
 #  Merge variant period info to deaths+population dataset
 datdeaths_waves <- datdeaths %>%
   mutate(wave = case_when(
-    start_date >= as_date("2020-03-01") & start_date <= as_date("2021-02-28") ~ "1st Wave: Original",
-    start_date >= as_date("2021-01-01") & start_date <= as_date("2021-06-30") ~ "2nd Wave: Alpha",
-    start_date >= as_date("2021-07-01") & start_date <= as_date("2021-11-30") ~ "3rd Wave: Delta",
-    start_date >= as_date("2021-12-01") & start_date <= as_date("2022-03-31") ~ "4th Wave: Omicron BA.1",
-    start_date >= as_date("2022-04-01") & start_date <= as_date("2023-06-14") ~ "5th Wave: Omicron BA.2–BA.5–XBB",
-    start_date >= as_date("2023-06-15") & start_date <= as_date("2024-03-31") ~ "6th Wave: XBB",
+    date >= as_date("2020-03-01") & date <= as_date("2021-02-28") ~ "1st Wave: Original",
+    date >= as_date("2021-01-01") & date <= as_date("2021-06-30") ~ "2nd Wave: Alpha",
+    date >= as_date("2021-07-01") & date <= as_date("2021-10-30") ~ "3rd Wave: Delta",
+    date >= as_date("2021-12-01") & date <= as_date("2022-03-31") ~ "4th Wave: Omicron BA.1",
+    date >= as_date("2022-04-01") & date <= as_date("2023-06-14") ~ "5th Wave: Omicron BA.2–BA.5–XBB",
+    date >= as_date("2023-06-15") & date <= as_date("2024-03-31") ~ "6th Wave: XBB",
     TRUE ~ NA_character_
   )) %>%
   filter(!is.na(wave))
+View(datdeaths_waves)
+
+#death rates (per 100,000) by state and wave
+state_wave_death_rates <- datdeaths_waves %>%
+  group_by(state, wave, state_name, region_name) %>%
+  summarise(
+    total_deaths = sum(total_deaths, na.rm = TRUE),
+    avg_population = mean(Population, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(death_rate_per_100k = (total_deaths / avg_population) * 100000)
+
+#Compute average death rates by region and wave
+region_wave_death_rates <- datdeaths_waves %>%
+  group_by(region_name, wave) %>%
+  summarise(
+    total_deaths = sum(total_deaths, na.rm = TRUE),
+    total_population = sum(mean(Population), na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(death_rate_per_100k = (total_deaths / total_population) * 100000)
+
+head(region_wave_death_rates)
+
+plot5 <- ggplot(region_wave_death_rates, aes(x = wave, y = death_rate_per_100k, fill = region_name)) +
+  geom_col(position = "dodge") +
+  labs(title = "COVID-19 Death Rates by Region and Wave",
+       x = "Wave", y = "Death Rate per 100,000") +
+  theme_minimal() 
+
+ggsave("new/COVID-19 Death Rates by Region and Wave.pdf", plot= plot5, width = 12, height = 8)
+ggsave("new/COVID-19 Death Rates by Region and Wave.png", plot = plot5, width = 12, height = 8, dpi = 300)
+
+
 
 
 # Aggregate deaths and compute death rate per wave & state
 death_rates_by_wave <- datdeaths_waves %>%
   group_by(state, wave) %>%
   summarise(
-    total_deaths = sum(covid_19_deaths, na.rm = TRUE),
+    total_deaths = sum(total_deaths, na.rm = TRUE),
     population = max(Population, na.rm = TRUE),  # Use latest available for that year
     .groups = "drop"
   ) %>%
@@ -344,8 +393,8 @@ summary_table <- top5_by_wave %>%
   mutate(`Death Rate` = round(`Death Rate`, 1)) %>%
   arrange(Wave, desc(`Death Rate`))
 
-# Plot5: Top 5 States by COVID-19 Death Rate for Each Variant Wave -facet by wave
-plot5 <- ggplot(top5_by_wave, aes(x = fct_reorder(state, death_rate), y = death_rate, fill = wave)) +
+# Plot6: Top 5 States by COVID-19 Death Rate for Each Variant Wave -facet by wave
+plot6 <- ggplot(top5_by_wave, aes(x = fct_reorder(state, death_rate), y = death_rate, fill = wave)) +
   geom_col(show.legend = FALSE) +
   coord_flip() +
   facet_wrap(~ wave, scales = "free_y") +
@@ -359,15 +408,15 @@ plot5 <- ggplot(top5_by_wave, aes(x = fct_reorder(state, death_rate), y = death_
     strip.text = element_text(face = "bold"),
     axis.text.x = element_text(angle = 0, hjust = 1)
   )
-ggsave("docs/Top 5 States by COVID-19 Death Rate for Each Variant Wave.pdf", plot= plot5, width = 12, height = 8)
-ggsave("docs/Top 5 States by COVID-19 Death Rate for Each Variant Wave.png", plot = plot5, width = 12, height = 8, dpi = 300)
+ggsave("new/Top 5 States by COVID-19 Death Rate for Each Variant Wave.pdf", plot= plot6, width = 12, height = 8)
+ggsave("new/Top 5 States by COVID-19 Death Rate for Each Variant Wave.png", plot = plot6, width = 12, height = 8, dpi = 300)
 
    
 ```
 
 ```{r}
 
-#Plot 6: Heatmap of State-wise COVID-19 Death Rates per Wave
+#Plot 7: Heatmap of State-wise COVID-19 Death Rates per Wave
 
 ggplot(death_rates_by_wave, aes(x = wave, y = reorder(state, desc(death_rate)), fill = death_rate)) +
   geom_tile(color = "white") +
@@ -387,21 +436,21 @@ ggplot(death_rates_by_wave, aes(x = wave, y = reorder(state, desc(death_rate)), 
 ```
 
 ```{r}
-# Plot7:Time series plot -top 10 states overall by total deaths Mar 2020 -Dec 2021
-top10_states <- datdeaths %>%
+# Plot8:Time series plot -top 5 states overall by total deaths Mar 2020 -Dec 2021
+top5_states <- datdeaths %>%
   group_by(state) %>%
-  summarise(total_deaths = sum(covid_19_deaths, na.rm = TRUE)) %>%
+  summarise(total_deaths = sum(total_deaths, na.rm = TRUE)) %>%
   arrange(desc(total_deaths)) %>%
-  slice_head(n = 10) %>%
+  slice_head(n = 5) %>%
   pull(state)
 
-top10_data <- datdeaths %>%
-  filter(state %in% top10_states)
+top5_data <- datdeaths %>%
+  filter(state %in% top5_states)
 
-plot7 <- ggplot(top10_data, aes(x = start_date, y = covid_19_deaths, color = state)) +
+plot8 <- ggplot(top10_data, aes(x = date, y = total_deaths, color = state)) +
   geom_line(size = 1) +
   labs(
-    title = "COVID-19 Deaths Over Time – Top 10 States",
+    title = "COVID-19 Deaths Over Time – Top 5 States",
     x = "Date",
     y = "Deaths",
     color = "State"
@@ -409,30 +458,32 @@ plot7 <- ggplot(top10_data, aes(x = start_date, y = covid_19_deaths, color = sta
   theme_minimal(base_size = 13) +
   scale_x_date(date_breaks = "3 months", date_labels = "%b\n%Y") +
   theme(legend.position = "bottom")
-ggsave("docs/COVID-19 Deaths Over Time – Top 10 States.pdf", plot= plot7, width = 12, height = 8)
-ggsave("docs/COVID-19 Deaths Over Time – Top 10 States.png", plot = plot7, width = 12, height = 8, dpi = 300)
+plot8
+ggsave("new/COVID-19 Deaths Over Time – Top 10 States.pdf", plot= plot8, width = 12, height = 8)
+ggsave("new/COVID-19 Deaths Over Time – Top 10 States.png", plot = plot8, width = 12, height = 8, dpi = 300)
 ```
 
 ```{r}
 
-# Plot7: Facet plot Covid deaths for top 10 states  
-facet_plot<- ggplot(top10_data, aes(x = start_date, y = covid_19_deaths)) +
+# Plot9: Facet plot Covid deaths for top 10 states  
+facet_plot<- ggplot(top5_data, aes(x = date, y = total_deaths)) +
   geom_line(color = "steelblue", size = 1) +
   geom_smooth(se = FALSE, color = "darkred", method = "loess", span = 0.3) +
   facet_wrap(~ state, scales = "free_y", nrow=3) +
   labs(
-    title = "COVID-19 Deaths Over Time – Faceted by Top 10 States",
+    title = "COVID-19 Deaths Over Time – Faceted by Top 5 States",
     x = "Date",
     y = "Deaths"
   ) +
-  scale_x_date(date_breaks = "3 months", date_labels = "%b\n%Y") +
+  scale_x_date(date_breaks = "6 months", date_labels = "%b\n%Y") +
   theme_minimal(base_size = 13) +
   theme(
     strip.text = element_text(face = "bold"),
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
-ggsave("docs/facet_top10_states.png", plot = facet_plot, width = 12, height = 8, dpi = 300)
-ggsave("docs/facet_top10_states.pdf", plot = facet_plot, width = 12, height = 8)
+facet_plot
+ggsave("new/facet_top10_states.png", plot = facet_plot, width = 12, height = 8, dpi = 300)
+ggsave("new/facet_top10_states.pdf", plot = facet_plot, width = 12, height = 8)
 facet_plot
 
 #Plot8: Time series plot -top 10 states overall by total deaths 
@@ -463,7 +514,7 @@ time_series_plot
 
 ## states consistently had lower death rates
 
-#plot9: Top 10 States with Lowest Average COVID-19 Death Rates
+#plot10: Top 5 States with Lowest Average COVID-19 Death Rates
 # Average death rate across waves per state
 average_death_rates <- death_rates_by_wave %>%
   group_by(state) %>%
@@ -477,7 +528,7 @@ average_death_rates <- death_rates_by_wave %>%
 # View states with consistently low death rates
 head(average_death_rates, 5)
 #This will give you the top 10 states with the lowest average death rates across #all COVID variant waves.
-plot9 <- ggplot(average_death_rates %>% slice_min(avg_death_rate, n = 5),
+plot10 <- ggplot(average_death_rates %>% slice_min(avg_death_rate, n = 5),
        aes(x = reorder(state, avg_death_rate), y = avg_death_rate)) +
   geom_col(fill = "steelblue") +
   coord_flip() +
@@ -487,8 +538,8 @@ plot9 <- ggplot(average_death_rates %>% slice_min(avg_death_rate, n = 5),
     y = "Average Death Rate (per 100,000)"
   ) +
   theme_minimal(base_size = 13)
-ggsave("docs/Top 5 States with Lowest Average COVID-19 Death Rates.pdf", plot= plot9, width = 12, height = 8)
-ggsave("docs/Top 5 States with Lowest Average COVID-19 Death Rates.png", plot = plot9, width = 12, height = 8, dpi = 300)
+ggsave("new/Top 5 States with Lowest Average COVID-19 Death Rates.pdf", plot= plot10, width = 12, height = 8)
+ggsave("new/Top 5 States with Lowest Average COVID-19 Death Rates.png", plot = plot10, width = 12, height = 8, dpi = 300)
 ```
 
 ```{r}
@@ -511,7 +562,7 @@ head(state_trends, 5)  # most improved
 tail(state_trends, 5)  # most worsened
 
 #plot 10: Trend analysis Death Rates by State Across Variant Waves
-plot10 <- ggplot(death_rates_by_wave, aes(x = wave, y = death_rate, group = state, color = state)) +
+plot11 <- ggplot(death_rates_by_wave, aes(x = wave, y = death_rate, group = state, color = state)) +
   geom_line(show.legend = FALSE, alpha = 0.6) +
   labs(
     title = "Trend of Death Rates by State Across Variant Waves",
@@ -521,8 +572,8 @@ plot10 <- ggplot(death_rates_by_wave, aes(x = wave, y = death_rate, group = stat
   theme_minimal(base_size = 13) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-ggsave("docs/Trend of Death Rates by State Across Variant Waves.pdf", plot= plot10, width = 12, height = 8)
-ggsave("docs/Trend of Death Rates by State Across Variant Waves.png", plot = plot10, width = 12, height = 8, dpi = 300)
+ggsave("new/Trend of Death Rates by State Across Variant Waves.pdf", plot= plot11, width = 12, height = 8)
+ggsave("new/Trend of Death Rates by State Across Variant Waves.png", plot = plot11, width = 12, height = 8, dpi = 300)
 
 ```
 

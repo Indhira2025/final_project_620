@@ -1,0 +1,612 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+getwd()
+
+```{r}
+
+
+library(httr2)
+library(dplyr)
+library(lubridate)
+library (janitor)
+library(ggplot2)
+library(scales)
+library(knitr)
+library(tidyverse)
+
+getwd()
+
+##Retreving Data from cdc Website for covid cases, deaths, hospitalizations and ##vaccines
+
+get_cdc_data <- function(endpoint) {
+  api_url <- paste0("https://data.cdc.gov/resource/", endpoint, ".json")
+  
+  data <- request(api_url) |> 
+    req_url_query("$limit" = 10000000) |> 
+    req_perform() |> 
+    resp_body_json(simplifyVector = TRUE)
+  
+  return(data)
+}
+cases_raw <- get_cdc_data("pwn4-m3yp")
+hosp_raw <- get_cdc_data("39z2-9zu6")
+deaths_raw <- get_cdc_data("r8kw-7aab")
+vax_raw <- get_cdc_data("rh2h-3yt2")
+head(deaths_raw)
+
+
+
+# Working on the covid deaths data 2020-2025
+#View(deaths_raw)
+head(deaths_raw)
+state_abbreviations <- c(state.abb, "DC", "PR")
+state_names <- c(state.name, "District of Columbia", "Puerto Rico")
+# Convert and summarize deaths data
+deaths_clean <- deaths_raw %>%
+  filter(state != "United States")%>%
+  mutate(
+    start_date = as_date(start_date),
+    covid_19_deaths = as.numeric(covid_19_deaths),
+    mmwr_year = epiyear(start_date),
+    mmwr_week = epiweek(start_date),
+  )%>%
+  select(start_date, state, mmwr_year, mmwr_week, covid_19_deaths) %>%
+  filter(start_date > as.Date("2020-01-01")) %>%
+  arrange(state, mmwr_year)  
+print(head(deaths_clean))
+
+
+
+library(zoo)  
+
+# Summarize deaths per day (national total)
+us_deaths_daily <- deaths_clean %>%
+  group_by(start_date) %>%
+  summarise(total_deaths = sum(covid_19_deaths, na.rm = TRUE), .groups = "drop") %>%
+  arrange(start_date) %>%
+  mutate(rolling_avg_7day = zoo::rollmean(total_deaths, k = 7, fill = NA, align = "right"))
+
+# Plot
+plot1 <- ggplot(us_deaths_daily, aes(x = start_date)) +
+  geom_col(aes(y = total_deaths), fill = "red", alpha = 0.8) +
+  geom_line(aes(y = rolling_avg_7day), color = "darkred", size = 1) +
+  labs(
+    title = "Daily COVID-19 Deaths in the US",
+    subtitle = "With 10-Day Rolling Average",
+    x = "Date",
+    y = "Number of Deaths"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_x_date(date_breaks = "6 months",date_labels = "%b %Y")+
+  scale_y_continuous(limits = c(0, 150000), labels = scales::label_comma())
+plot1
+
+ggsave("docs/new/Covid deaths in US (2020-2025).pdf", plot= plot1, width = 12, height = 8)
+ggsave("docs/new/Covid deaths in US (2020-2025).png", plot = plot1, width = 12, height = 8, dpi = 300)
+
+
+```
+
+```{r}
+library(ggplot2)
+library(scales)
+library(dplyr)
+library(lubridate)
+
+## Divide the pandemic period, January 2020 to April 2025 into waves
+
+variant_waves <- tibble::tibble(
+  start = as_date(c("2020-03-01", "2021-01-01", "2021-07-01", "2021-12-01", "2022-04-01", "2023-06-15")),
+  end   = as_date(c("2021-02-28", "2021-06-30", "2021-10-30", "2022-03-31", "2023-06-14", "2024-03-31")),
+  variant = c("1st Wave: Original", 
+              "2nd Wave: Alpha", 
+              "3rd Wave: Delta", 
+              "4th Wave: Omicron BA.1", 
+              "5th Wave: Omicron Other",
+              "6th Wave: XBB")
+)
+
+# Plot2: Covid deaths with variant overlay by state
+plot2 <- ggplot(us_deaths_daily, aes(x = start_date, y = total_deaths)) +
+  geom_rect(
+    data = variant_waves,
+    aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf, fill = variant),
+    inherit.aes = FALSE,
+    alpha = 0.2
+  ) +
+  geom_line(aes(y = rolling_avg_7day), color = "darkred", size = 1) +
+  scale_x_date(date_labels = "%b/%Y", date_breaks = "6 months") +
+  labs(
+    title = "US Weekly COVID-19 Deaths with Variant Waves (2020–2025)",
+    x = "Month/Year",
+    y = "Total Deaths",
+    fill = "Variant Waves"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  scale_y_continuous(limits = c(0, 150000), labels = scales::label_comma())
+plot2
+ggsave("docs/new/Covid deaths with variant overlay by state.pdf", plot= plot2, width = 12, height = 8)
+ggsave("docs/new/Covid deaths with variant overlay by state.png", plot = plot2, width = 12, height = 8, dpi = 300)
+```
+
+Compare COVID-19 death trends by state over time using small multiples (facets).
+
+```{r}
+
+#plot3: Covid-19 deaths by State
+plot3 <-deaths_clean %>%
+  group_by(state, start_date) %>%
+  summarise(total_deaths = sum(covid_19_deaths, na.rm = TRUE), .groups = "drop") %>%
+  ggplot(aes(x = start_date, y = total_deaths)) +
+  geom_line(color = "darkred") +
+  facet_wrap(~ state, scales = "free_y") +
+  labs(
+    title = "COVID-19 Deaths by State",
+    x = "Date",
+    y = "Deaths"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+plot3
+#ggsave("docs/new/COVID-19 Deaths by State.pdf", plot= plot3, width = 12, height = 8)
+#ggsave("docs/new/COVID-19 Deaths by State.png", plot = plot3, width = 12, height = 8, dpi = 300)
+
+```
+
+A heatmap showing intensity of deaths by week and state.
+
+```{r}
+library(dplyr)
+library(lubridate)
+library(stringr)
+library(ggplot2)
+library(viridis)
+
+##A heatmap showing intensity of deaths by week and state.
+
+deaths_filtered <- deaths_clean %>%
+  filter(!state %in% c("United States", "New York City"))
+deaths_quarterly <- deaths_filtered %>%
+  mutate(quarter = paste0(year(start_date), " Q", quarter(start_date))) %>%
+  group_by(state, quarter) %>%
+  summarise(total_deaths = sum(covid_19_deaths, na.rm = TRUE), .groups = "drop")
+deaths_quarterly$quarter <- factor(deaths_quarterly$quarter, levels = unique(deaths_quarterly$quarter))
+
+#plot4: Heatmap showing intensity of deaths by state
+plot4 <- ggplot(deaths_quarterly, aes(x = quarter, y = state, fill = total_deaths)) +
+  geom_tile(color = "white") +
+  scale_fill_viridis(option = "magma", name = "Deaths", direction = -1) +
+  labs(
+    title = "COVID-19 Deaths by State (Quarterly)",
+    x = "Quarter",
+    y = "State"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 7),
+    axis.text.y = element_text(size = 6)
+  )
+plot4  
+ggsave("docs/new/COVID-19 Deaths by State (Quarterly).pdf", plot= plot4, width = 12, height = 8)
+ggsave("docs/new/COVID-19 Deaths by State (Quarterly).png", plot = plot4, width = 12, height = 8, dpi = 300)
+
+```
+
+```{r}
+
+## Reteriving the population of US states form Census website
+
+library(jsonlite)
+library(purrr)
+library(tidyverse)
+census_key <- "a498a5717131540bcea2c82b3e8fd47a367cef98"
+url <- "https://api.census.gov/data/2021/pep/population"
+request <- request(paste0(url,
+    paste0("?get=POP_2020,POP_2021,NAME&for=state:*&key=",
+           census_key)))
+print(request)
+response <- request |> req_perform() 
+response
+
+content_type <- resp_content_type(response)
+cat("The content type of the response is:", content_type, "\n")
+population <- response |>resp_body_string()|>jsonlite::fromJSON()
+head(population)
+
+population <- population %>%
+  row_to_names(row_number = 1)%>%
+  as_tibble()
+head(population)
+
+pop_latest<- read.csv("data/population_estimate_census.csv")
+#head(pop_latest)
+pop_latest_new2 <- pop_latest %>%
+  mutate(
+    POP_2022 = as.character(gsub(",", "", X2022)),
+    POP_2023 = as.character(gsub(",", "", X2023)),
+    POP_2024 = as.character(gsub(",", "", X2024)),
+    state_name = str_remove(state_name, "^\\.")
+  ) %>%
+  rename(NAME= "state_name") %>% 
+  select(NAME, POP_2022, POP_2023, POP_2024) %>% 
+  as.data.frame()
+pop_latest_new2 
+
+population_new <- population %>% 
+  left_join(pop_latest_new2, by = "NAME")
+head(population_new)
+
+cleaned_population <- population_new %>% #changing this
+  select(-state) %>%
+  rename(state_name = NAME)%>%
+  pivot_longer(cols = starts_with("POP_"),  
+               names_to = "Year",
+               values_to = "Population") %>%
+  mutate(Year = gsub("POP_", "", Year),  
+         Year = as.integer(Year), 
+         Population = as.numeric(Population))  
+
+state_abbreviations <- c(state.abb, "DC", "PR")
+state_names <- c(state.name, "District of Columbia", "Puerto Rico")
+
+cleaned_population <- cleaned_population %>%
+  mutate(
+    state = case_when(
+      state_name %in% state_names ~ state_abbreviations[match(state_name, state_names)]
+    )
+  )
+head(cleaned_population)
+unique(cleaned_population$Year)
+colnames(cleaned_population)
+
+#adding Region name data
+url <- "https://github.com/datasciencelabs/2024/raw/refs/heads/main/data/regions.json"
+# regions <- use fromJSON to read as a data.frame
+regions_data <- fromJSON(url)
+#str(regions_data)
+#head(regions_data)
+#View(regions_data)
+unique(regions_data$region_name)
+# Convert the JSON data to a data frame and process it
+regions <- regions_data %>%
+  # Unnest the states from the nested list
+  unnest(cols = states) %>%
+  # Rename the columns
+  rename(state_name = states) %>%
+  # Rename the region with a long name to something shorter
+  mutate(region_name = ifelse(region_name == "New York and New Jersey, Puerto Rico, Virgin Islands", "NYNJPV", region_name)) %>%
+  # Ensure the region_name column is a factor
+  mutate(region_name = factor(region_name))
+
+# Print the first few rows of the regions data frame
+head(regions)
+#view(regions)
+#class(regions$region_name)
+
+cleaned_population <- cleaned_population %>%
+  left_join(regions, by = "state_name")
+head(cleaned_population)
+
+all_dates <- data.frame(date = seq(make_date(2020, 1, 25),
+                                   make_date(2024, 12, 31), 
+                                   by = "week")) |>
+  mutate(date = ceiling_date(date, unit = "week", week_start = 7) - days(1)) |>
+  mutate(mmwr_year = epiyear(date), mmwr_week = epiweek(date)) 
+
+
+dates_and_pop <- cross_join(all_dates, data.frame(state = unique(cleaned_population$state))) |> left_join(cleaned_population, by = c("state", "mmwr_year" = "Year"))
+head(dates_and_pop)
+
+unique(dates_and_pop$mmwr_year)
+#View(dates_and_pop)
+
+
+dates_and_pop1 <-dates_and_pop %>% 
+  mutate(mmwr_year= as.character(mmwr_year)) 
+  
+head(dates_and_pop1)
+colnames(deaths_clean)
+unique(deaths_clean$mmwr_year)
+
+us_deaths_weekly <- deaths_clean %>%
+  rename(state_name= "state")%>%
+  group_by(start_date,state_name, mmwr_week, mmwr_year) %>%
+  summarise(total_deaths = sum(covid_19_deaths, na.rm = TRUE), .groups = "drop") %>% 
+  arrange(state_name, mmwr_week)
+unique(us_deaths_weekly$mmwr_year)
+
+us_deaths_weeklyregion <-us_deaths_weekly %>% 
+  left_join(regions, by = "state_name")
+head(us_deaths_weeklyregion)  
+
+#View(us_deaths_weeklyregion)
+# merging the population data
+datdeaths<-us_deaths_weeklyregion %>%
+  left_join(dates_and_pop, by = c("state_name", "mmwr_year", "mmwr_week","region_name"))
+
+#View(datdeaths1)
+
+#datdeaths <- dates_and_pop %>%
+  #left_join(us_deaths_weekly, by = c("state_name", "mmwr_year", "mmwr_week"))  
+  #left_join(pop_latest_new1,by = c("state_name", "mmwr_year","mmwr_week"))
+head(datdeaths)
+View(datdeaths)
+
+colnames(datdeaths)
+unique(datdeaths$mmwr_year)
+
+```
+
+```{r}
+
+##  For each period, compute the death rates by state. Describe which states did 
+## better or worse during the different periods.
+
+
+#  Merge variant period info to deaths+population dataset
+datdeaths_waves <- datdeaths %>%
+  mutate(wave = case_when(
+    start_date >= as_date("2020-03-01") & start_date <= as_date("2021-02-28") ~ "1st Wave: Original",
+    start_date >= as_date("2021-01-01") & start_date <= as_date("2021-06-30") ~ "2nd Wave: Alpha",
+    start_date >= as_date("2021-07-01") & start_date <= as_date("2021-10-30") ~ "3rd Wave: Delta",
+    start_date >= as_date("2021-12-01") & start_date <= as_date("2022-03-31") ~ "4th Wave: Omicron BA.1",
+    start_date >= as_date("2022-04-01") & start_date <= as_date("2023-06-14") ~ "5th Wave: Omicron-BA",
+    start_date >= as_date("2023-06-15") ~ "6th Wave:Omicron other",
+    TRUE ~ NA_character_
+  )) %>%
+  filter(!is.na(wave))
+
+
+head(datdeaths_waves)
+
+
+
+
+#Compute average death rates by region and wave
+region_wave_death_rates <- datdeaths_waves %>%
+  mutate(population = as.numeric(unlist(Population))) %>%
+  group_by(region_name) %>%
+  mutate(population = ifelse(is.nan(Population), NA, Population)) %>%
+  fill(Population, .direction = "down")
+region_data<- region_wave_death_rates %>%   
+  group_by(region_name,wave) %>%
+  summarise(
+    total_deaths = sum(total_deaths, na.rm = TRUE),
+    total_population = mean(Population, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(death_rate_per_100k = (total_deaths / total_population) * 100000)
+#View(region_data)
+
+library(ggplot2)
+
+plot5 <- ggplot(region_data, aes(x = wave, y = death_rate_per_100k, fill = region_name)) +
+  geom_col(position = "dodge") +
+  labs(title = "COVID-19 Death Rates by Region and Wave",
+       x = "Wave", y = "Death Rate per 100,000") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+plot5
+
+#ggsave("docs/new/COVID-19 Death Rates by Region and Wave.pdf", plot= plot5, width = 12, height = 8)
+#ggsave("docs/new/COVID-19 Death Rates by Region and Wave.png", plot = plot5, width = 12, height = 8, dpi = 300)
+
+
+# Treand analysis of Death Rates Across COVID-19 Waves by Region
+
+# Treat wave as an ordered factor (for display)
+region_data <- region_data %>%
+  mutate(wave = factor(wave, levels = unique(wave), ordered = TRUE))
+
+plot_trend<- ggplot(region_data, aes(x = wave, y = death_rate_per_100k, group = region_name, color = region_name)) +
+  geom_point(size = 3) +
+  geom_line(aes(group = region_name)) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    title = "Linear Trend of Death Rates Across COVID-19 Waves by Region",
+    x = "Wave",
+    y = "Death Rate per 100,000",
+    color = "Region"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+plot_trend
+
+ggsave("docs/new/Linear Trend of Death Rates Across COVID-19 Waves by Region.pdf", plot= plot_trend, width = 12, height = 8)
+ggsave("docs/new/Linear Trend of Death Rates Across COVID-19 Waves by Region.png", plot = plot_trend, width = 12, height = 8, dpi = 300)
+
+
+
+#death rates (per 100,000) by state and wave
+state_wave_death_rates <- datdeaths_waves %>%
+  mutate(population = as.numeric(unlist(Population))) %>%
+  group_by(state_name) %>%
+  mutate(population = ifelse(is.nan(Population), NA, Population)) %>%
+  fill(Population, .direction = "down")
+state_data <-state_wave_death_rates %>% 
+  group_by(state_name,wave) %>% 
+  summarise(
+    total_deaths = sum(total_deaths, na.rm = TRUE),
+    avg_population = mean(Population, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(death_rate_per_100k = (total_deaths / avg_population) * 100000)
+#View(state_data)
+
+
+# Table 2: top states by death rate per wave
+topstate_by_wave <- state_data %>%
+  group_by(wave) %>%
+  slice_max(death_rate_per_100k, n = 1) %>%
+  arrange(desc(death_rate_per_100k)) %>% 
+  ungroup() 
+summary_table1 <- topstate_by_wave %>%
+  select(State = state_name, Wave = wave,Population= avg_population, `Death Rate` = death_rate_per_100k) %>%
+  arrange(Wave, desc(`Death Rate`))  
+summary_table1 <- topstate_by_wave %>%
+  select(State = state_name, Wave = wave, `Death Rate` = death_rate_per_100k) %>%
+  mutate(`Death Rate` = round(`Death Rate`, 1)) %>%
+  arrange(Wave, desc(`Death Rate`))
+kable(summary_table1, caption = "Top States by COVID-19 Death Rate  per 100,000 population")
+
+# Table3 : top 5 states by death rate per wave
+top5_by_wave <- state_data %>%
+  group_by(wave) %>%
+  slice_max(death_rate_per_100k, n = 5) %>%
+  arrange(desc(death_rate_per_100k)) %>% 
+  ungroup() 
+# Prepare your summary table BEFORE using kable
+summary_table <- top5_by_wave %>%
+  select(State = state_name, Wave = wave, `Death Rate` = death_rate_per_100k) %>%
+  arrange(Wave, desc(`Death Rate`))  # optional for nicer ordering
+kable(summary_table, caption = "Top 5 States by COVID-19 Death Rate per Variant Wave")
+summary_table <- top5_by_wave %>%
+  select(State = state_name, Wave = wave, `Death Rate` = death_rate_per_100k) %>%
+  mutate(`Death Rate` = round(`Death Rate`, 1)) %>%
+  arrange(Wave, desc(`Death Rate`))
+
+# Plot6: Top 5 States by COVID-19 Death Rate for Each Variant Wave -facet by wave
+plot6 <- ggplot(top5_by_wave, aes(x = fct_reorder(state_name, death_rate_per_100k), y = death_rate_per_100k, fill = wave)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  facet_wrap(~ wave, scales = "free_y") +
+  labs(
+    title = "Top 5 States by COVID-19 Death Rate for Each Variant Wave",
+    x = "State",
+    y = "Death Rate (per 100,000 people)"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    strip.text = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 0, hjust = 1)
+  )
+plot6
+ggsave("docs/new/Top 5 States by COVID-19 Death Rate for Each Variant Wave.pdf", plot= plot6, width = 12, height = 8)
+ggsave("docs/new/Top 5 States by COVID-19 Death Rate for Each Variant Wave.png", plot = plot6, width = 12, height = 8, dpi = 300)
+
+   
+```
+
+```{r}
+# Plot8:Time series plot -top 5 states overall by total deaths Mar 2020 -Dec 2021
+
+library(dplyr)
+library(knitr)
+
+top_state_per_year <- datdeaths %>%
+  filter(mmwr_year != 2025) %>% 
+  group_by(mmwr_year, state_name) %>%
+  summarise(
+    total_deaths = sum(total_deaths, na.rm = TRUE),
+    total_population = mean(Population, na.rm = TRUE),
+    death_rate_per_100k = (total_deaths / total_population) * 100000,
+    .groups = "drop"
+  ) %>%
+  group_by(mmwr_year) %>%
+  slice_max(death_rate_per_100k, n = 1) %>%  # top 1 state per year
+  ungroup() %>%
+  arrange(mmwr_year) %>%
+  rename(
+    Year = mmwr_year,
+    State = state_name,
+    Covid_Deaths = total_deaths,
+    Population = total_population,
+    Death_rate_per_100k = death_rate_per_100k
+  ) %>%
+  kable()
+
+top_state_per_year
+
+
+top5_statesname <- datdeaths %>%
+  filter(mmwr_year != 2025) %>% 
+  group_by(mmwr_year, state_name) %>%
+  summarise(
+    total_deaths = sum(total_deaths, na.rm = TRUE),
+    total_population = mean(Population, na.rm = TRUE),
+    death_rate_per_100k = (total_deaths / total_population) * 100000,
+    .groups = "drop"
+  ) %>%
+  group_by(mmwr_year) %>%
+  slice_max(death_rate_per_100k, n = 1) %>%  # top 1 state per year
+  ungroup() %>%
+  slice_head(n = 5) %>%
+  pull(state_name)
+top5_statesname 
+
+top5_data <- datdeaths %>%
+  filter(state_name %in% top5_statesname) 
+
+
+library(ggplot2)
+top_state_per_year_data <- datdeaths %>%
+  filter(mmwr_year != 2025) %>% 
+  group_by(mmwr_year, state_name) %>%
+  summarise(
+    total_deaths = sum(total_deaths, na.rm = TRUE),
+    total_population = mean(Population, na.rm = TRUE),
+    death_rate_per_100k = (total_deaths / total_population) * 100000,
+    .groups = "drop"
+  ) %>%
+  group_by(mmwr_year) %>%
+  slice_max(death_rate_per_100k, n = 1) %>%  # top 1 state per year
+  ungroup() %>% 
+  arrange(mmwr_year) %>%
+  rename(
+    Year = mmwr_year,
+    State = state_name,
+    Covid_Deaths = total_deaths,
+    Population = total_population,
+    Death_rate_per_100k = death_rate_per_100k
+  )
+top_state_per_year_data
+
+# Assuming `top_state_per_year` was created as shown earlier:
+
+plot8 <- ggplot(top_state_per_year_data, aes(x = factor(Year), y = Death_rate_per_100k, fill = State)) +
+  geom_col(width = 0.6) +
+  labs(
+    title = "Top State by COVID-19 Death Rate per 100,000 (by Year)",
+    x = "Year",
+    y = "Death Rate per 100,000",
+    fill = "State"
+  ) +
+  theme_minimal(base_size = 20) +
+  theme(legend.position = "bottom")
+plot8
+ggsave("docs/new/Top State by COVID-19 Death Rate per 100,000 (by Year).pdf", plot= plot8, width = 12, height = 8)
+ggsave("docs/new/Top State by COVID-19 Death Rate per 100,000 (by Year).png", plot = plot8, width = 12, height = 8, dpi = 300)
+```
+
+```{r}
+
+# Plot9: Facet plot Covid deaths for top 10 states  
+facet_plot<- ggplot(top5_data, aes(x = start_date, y = total_deaths)) +
+  geom_line(color = "steelblue", size = 1) +
+  geom_smooth(se = FALSE, color = "darkred", method = "loess", span = 0.3) +
+  facet_wrap(~ state_name,scales = "fixed") +
+  labs(
+    title = "COVID-19 Deaths Over Time – Faceted by States",
+    x = "Date",
+    y = "Deaths"
+  ) +
+  scale_x_date(date_breaks = "9 months", date_labels = "%b\n%Y") +
+  theme_minimal(base_size = 15) +
+  theme(
+    strip.text = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+facet_plot
+ggsave("docs/new/facet_top5_statesnew.png", plot = facet_plot, width = 12, height = 8, dpi = 300)
+ggsave("docs/new/facet_top5_statesnew.pdf", plot = facet_plot, width = 12, height = 8)
+
+
+
+```

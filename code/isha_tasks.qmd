@@ -33,15 +33,17 @@ covid_deaths <- deaths_raw %>%
 
 pre_covid_death <- pre_covid_raw %>% rename(state = jurisdiction, mmwr_week = mmwrweek, year = mmwryear) %>% select(-c(age_group))
 
-colnames(pre_covid_death)
-colnames(covid_deaths)
-unique(pre_covid_death1$state)
-unique(covid_deaths$state)
-
 pre_covid_death1 <- pre_covid_death %>% filter(state %in% covid_deaths$state, !state %in% c("United States", "New York City", "District of Columbia"),!is.na(covid_19_deaths), !is.na(total_deaths))
 
 covid_deaths1 <- covid_deaths %>% filter(state %in% pre_covid_death1$state,!is.na(covid_19_deaths)) %>% select(-c(group, month))
 ```
+
+```{r}
+pre_covid_death1 %>% mutate(mmwr_week = as.integer(mmwr_week), total_deaths = as.numeric(total_deaths))
+
+predict(lm(total_deaths ~ state + mmwr_week, data = pre_covid_death1), covid_deaths1 %>% select(state, mmwr_week))
+```
+
 
 ## Expected Weekly Deaths - Average 
 ```{r}

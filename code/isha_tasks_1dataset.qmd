@@ -15,18 +15,18 @@ library(knitr)
 library(MMWRweek)
 library(gganimate)
 source("./data_code/funcs.R")
-deaths_url <- "https://data.cdc.gov/resource/r8kw-7aab.json"
-vax_url   <- "https://data.cdc.gov/resource/rh2h-3yt2.json"
+deaths_url_IK <- "https://data.cdc.gov/resource/r8kw-7aab.json"
+vax_url_IK   <- "https://data.cdc.gov/resource/rh2h-3yt2.json"
 
-deaths_raw <- get_cdc_data(deaths_url)
-vax_raw   <- get_cdc_data(vax_url)
+deaths_raw_IK <- get_cdc_data(deaths_url_IK)
+vax_raw_IK   <- get_cdc_data(vax_url_IK)
 
 ```
 
 #Pre-Processing and Data Exploration 
 ```{r}
 
-covid_deaths <- deaths_raw %>%
+covid_deaths_IK <- deaths_raw_IK %>%
   mutate(week_ending_date = as.Date(week_ending_date),
          start_date = as.Date(start_date),
          end_date = as.Date(end_date)) %>%
@@ -36,7 +36,7 @@ covid_deaths <- deaths_raw %>%
 
 ## Expected Excess Deaths Calculation
 ```{r}
-excess_death <- covid_deaths %>% mutate(mmwr_week = as.integer(mmwr_week), total_deaths = as.numeric(total_deaths), covid_19_deaths = as.numeric(covid_19_deaths), percent_of_expected_deaths = as.numeric(percent_of_expected_deaths)) %>% 
+excess_death <- covid_deaths_IK %>% mutate(mmwr_week = as.integer(mmwr_week), total_deaths = as.numeric(total_deaths), covid_19_deaths = as.numeric(covid_19_deaths), percent_of_expected_deaths = as.numeric(percent_of_expected_deaths)) %>% 
   mutate(expected_deaths = total_deaths/(percent_of_expected_deaths/100), excess_deaths = total_deaths - expected_deaths, percent_change = (excess_deaths/expected_deaths)*100) %>% filter(!is.na(expected_deaths))
 
 excess_death
@@ -52,7 +52,7 @@ excess_death <- excess_death %>%
 
 ggplot(excess_death, aes(x = week_ending_date, y = percent_change, color = region)) + geom_line(alpha = 0.4) + labs(title = "Excess Deaths (%) by Week and Region", y = "% Excess Mortality", x = "Week") +  geom_smooth(se = FALSE, method = "loess", span = 0.3, color = "black") + theme_minimal()
 
-variant_waves <- tibble::tibble(
+variant_waves_IK <- tibble::tibble(
   start = as_date(c("2020-03-01", "2021-01-01", "2021-07-01", "2021-12-01", "2022-04-01", "2023-06-15")),
   end   = as_date(c("2021-02-28", "2021-06-30", "2021-11-30", "2022-03-31", "2023-06-14", "2024-03-31")),
   variant = c("1st Wave: Original", 
@@ -65,7 +65,7 @@ variant_waves <- tibble::tibble(
 
 ggplot(excess_death, aes(x = week_ending_date, y = percent_change, color = state)) +
   geom_rect(
-    data = variant_waves,
+    data = variant_waves_IK,
     aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf, fill = variant),
     inherit.aes = FALSE,
     alpha = 0.2
@@ -81,11 +81,11 @@ ggplot(excess_death, aes(x = week_ending_date, y = percent_change, color = state
 ### Smoothing Line With Animation
 ```{r}
 
-loess_fit <- loess(percent_change ~ as.numeric(week_ending_date), data = excess_death, span = 0.3)
-excess_death$loess_smooth <- predict(loess_fit)
+loess_fit_IK <- loess(percent_change ~ as.numeric(week_ending_date), data = excess_death, span = 0.3)
+excess_death$loess_smooth <- predict(loess_fit_IK)
 
 gg_animate <- ggplot(excess_death, aes(x = week_ending_date)) +
-  geom_rect(data = variant_waves, aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf, fill = variant), inherit.aes = FALSE, alpha = 0.2) + geom_line(aes(y = loess_smooth), color = "black", linewidth = 1) +
+  geom_rect(data = variant_waves_IK, aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf, fill = variant), inherit.aes = FALSE, alpha = 0.2) + geom_line(aes(y = loess_smooth), color = "black", linewidth = 1) +
   labs(title = "Excess Mortality Trend by Week and State with Variant Waves", x = "Week", y = "% Excess Mortality", fill = "Variant Waves") + theme(axis.text.x = element_text(angle = 45, hjust = 1),plot.title = element_text(hjust = 0.5)) + transition_reveal(week_ending_date) + theme_minimal()
 
 animate(gg_animate, width = 900, height = 600, fps = 20, duration = 10, renderer = gifski_renderer("loess_animation.gif"), loop = FALSE)
@@ -134,8 +134,8 @@ covid_excess_death
 ### How many Excess Deaths can be Attributed to COVID-19?
 
 ```{r}
-diff_death <- excess_death %>% mutate(diff_death = excess_deaths - covid_19_deaths) %>% filter(excess_deaths >=0)
-diff_death %>% ggplot(aes(x = covid_19_deaths, y = diff_death)) + geom_point() + geom_hline(yintercept = 0, color = "red") + labs(x = "Deaths by Covid-19", y = "Difference in Excess and Covid-19 Deaths") + theme_minimal()
+diff_death_IK <- excess_death %>% mutate(diff_death = excess_deaths - covid_19_deaths) %>% filter(excess_deaths >=0)
+diff_death_IK %>% ggplot(aes(x = covid_19_deaths, y = diff_death)) + geom_point() + geom_hline(yintercept = 0, color = "red") + labs(x = "Deaths by Covid-19", y = "Difference in Excess and Covid-19 Deaths") + theme_minimal()
 ```
 
 ### Considering Impact on Excess Deaths by Respiratory Diseases that were not COVID-19
@@ -146,10 +146,10 @@ excess_death <- excess_death %>%
                           year %in% c("2021/2022", "2021-2022") ~ 2022,
                           TRUE ~ as.numeric(year)))
 
-vax_clean <- vax_raw %>% select(date, series_complete_daily, location, mmwr_week) %>% mutate(series_complete_daily = as.numeric(series_complete_daily), state = state.name[match(location, state.abb)], year = epiyear(date)) %>% group_by(year, mmwr_week, state) %>% summarize(date = max(as.Date(date)),
+vax_clean_IK <- vax_raw %>% select(date, series_complete_daily, location, mmwr_week) %>% mutate(series_complete_daily = as.numeric(series_complete_daily), state = state.name[match(location, state.abb)], year = epiyear(date)) %>% group_by(year, mmwr_week, state) %>% summarize(date = max(as.Date(date)),
   series_complete_weekly = sum(series_complete_daily, na.rm = TRUE), .groups = "drop") %>% mutate(mmwr_week = as.integer(mmwr_week))
 
-vax_excess <- left_join(excess_death, vax_clean, by = c("year", "mmwr_week", "state")) %>% mutate(pneumonia_deaths_alone = as.numeric(pneumonia_deaths) - as.numeric(pneumonia_and_covid_19_deaths), influenza_deaths = as.numeric(influenza_deaths)) %>% filter(year<2024)
+vax_excess <- left_join(excess_death, vax_clean_IK, by = c("year", "mmwr_week", "state")) %>% mutate(pneumonia_deaths_alone = as.numeric(pneumonia_deaths) - as.numeric(pneumonia_and_covid_19_deaths), influenza_deaths = as.numeric(influenza_deaths)) %>% filter(year<2024)
 
 other_excess_death <- summary(lm(
   excess_deaths ~ covid_19_deaths + pneumonia_deaths_alone + influenza_deaths +
@@ -359,7 +359,7 @@ ggplot(resp_analysis, aes(x = MMWRweek2Date(MMWRyear = year, MMWRweek = mmwr_wee
 # pneumonia_analysis <- pneumonia_analysis %>%
 #   mutate(week_ending_date = MMWRweek2Date(MMWRyear = year, MMWRweek = mmwr_week), perc_excess = (diff/expected_pneumonia)*100)
 # ggplot(pneumonia_analysis, aes(x = week_ending_date, y = perc_excess)) +
-#   geom_rect(data = variant_waves, aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf, fill = variant),
+#   geom_rect(data = variant_waves_I, aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf, fill = variant),
 #     inherit.aes = FALSE,
 #     alpha = 0.2
 #   ) +

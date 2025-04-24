@@ -1,0 +1,13 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+```{r}
+#getwd()
+source("./code/finalprojectcode.R")
+print(topstate_by_wave_v)
+print(top_state_per_year_v)
+
+```

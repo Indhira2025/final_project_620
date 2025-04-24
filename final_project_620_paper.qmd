@@ -1,8 +1,70 @@
 ---
-title: "Untitled"
+title: "From Outbrek to Endemic: Covid-19 in the US"
 format: html
 editor: visual
 ---
+
+# 
+
+Indhira Vadivel, Isha Khapre, Medha Rao
+
+# Introduction
+
+The COVID-19 pandemic represents one of the most consequential public health crises of the 21st century. Since the first confirmed U.S. cases in early 2020, the nation has faced an evolving series of challenges in containing the virus, managing its health effects, and grappling with its far-reaching societal disruptions. The initial phase of the pandemic was marked by limited testing, widespread uncertainty, and rapidly rising transmission rates, quickly escalating the crisis to a national emergency. Over time, the landscape of the pandemic shifted as vaccines were developed and deployed, public health strategies adapted, and the virus evolved into new variants. By early 2025, COVID-19 had transitioned from an acute pandemic into a more endemic condition—still impactful, but with changing dynamics.
+
+This paper presents a comprehensive analysis of COVID-19 mortality in the United States from 2020 through early 2025. Our central goal is to visualize and interpret how death rates changed over time, with a focus on identifying and characterizing distinct “waves” of elevated mortality. These pandemic waves, defined by periods of increased case counts and deaths, offer valuable insight into how the virus spread, how new variants influenced severity, and how public health responses shaped outcomes. Understanding these trends is crucial for contextualizing the overall trajectory of the pandemic.
+
+Importantly, the effects of COVID-19 were not experienced uniformly across the country. States and regions varied widely in the timing, intensity, and consequences of outbreaks. Differences in public health policies, population density, health care capacity, vaccination uptake, and social behaviors all contributed to this geographic variation. To better understand these disparities, we examine the spatial distribution of COVID-19 deaths and excess mortality at both the state and U.S. Census region levels.
+
+A key focus of our analysis is on how mortality patterns changed across successive waves. Early variants of the virus were associated with high death rates, particularly among older adults and those with pre-existing conditions. However, as more transmissible variants like Delta and Omicron emerged, the profile of disease severity shifted. We explore how rising population immunity—through vaccination and prior infection—alongside improved treatment strategies may have contributed to changing patterns of mortality risk.
+
+Beyond official COVID-19 deaths, we analyze excess mortality as a broader metric of the pandemic’s toll. This measure captures deaths above expected baselines, encompassing not only directly attributed COVID-19 fatalities but also indirect deaths caused by disruptions to health care, mental health impacts, and economic instability. By comparing excess mortality across states and over time, we aim to identify consistent patterns and investigate whether some states faced disproportionate impacts.
+
+Finally, we consider the possibility of misclassified deaths, especially during the early stages of the pandemic when testing capacity was limited. By analyzing trends in pneumonia-related mortality, which may overlap clinically with COVID-19, we explore whether some early fatalities were undercounted or misattributed. 
+
+Through this multifaceted approach, our study provides a data-driven account of the COVID-19 pandemic’s evolving impact in the United States. By integrating time trends, geographic disparities, and clinical indicators, we aim to contribute to a deeper understanding of the crisis and inform strategies for managing future infectious disease threats.
+
+# Methods
+
+To analyze COVID-19 mortality trends and excess deaths in the United States from 2020 to 2025, we obtained publicly available data from the **Centers for Disease Control and Prevention (CDC)**. Specifically, we accessed datasets containing information on confirmed COVID-19 cases, hospitalizations, deaths, and vaccination coverage through the CDC’s open data portal (<https://data.cdc.gov/>), using API endpoints and automated querying. The datasets used included:
+
+-   **COVID-19 Cases** 
+
+-   **COVID-19 Hospitalizations**
+
+-   **COVID-19 Deaths**
+
+-   **COVID-19 Vaccinations** 
+
+To streamline data access and ensure reproducibility, we built a custom function in R using the httr2 package, which allowed for efficient API calls and retrieval of large datasets (up to 10 million records per query).
+
+### Visualization and Analysis of Covid-19 Deaths
+
+**Data Processing and Cleaning\
+** We used a state-level COVID-19 mortality dataset and excluded national aggregates to focus on regional and state-specific trends. Dates were converted to Date format, and MMWR week and year variables were derived using the epiyear() and epiweek() functions from the epitools package. COVID-19 death counts were converted to numeric values, and only data from January 1, 2020, onwards were retained. All variable names and formats were standardized using the janitor package to ensure consistency.
+
+**Computation of Daily and Rolling Mortality Trends\
+**  To explore national mortality trends, daily COVID-19 deaths were aggregated across states, and a 7-day rolling average was computed using the zoo package to smooth short-term fluctuations. This time series enabled identification of major waves in mortality patterns.
+
+**Wave Classification and Variant Overlay\
+**  We manually defined six distinct pandemic waves corresponding to dominant SARS-CoV-2 variants based on CDC reports and literature. These wave periods were labeled using the tibble package and overlaid as shaded intervals onto national mortality plots using ggplot2::geom_rect() alongside the rolling average trend line.
+
+**State-Level Quarterly Mortality Visualization\
+**  We created a heatmap of state-level COVID-19 deaths by calendar quarter to explore geographic variation. Weekly data were aggregated to state-quarters using lubridate::quarter() and visualized with geom_tile() and the viridis::magma color scale, enabling comparison across regions and time.
+
+**Integration of Population and Regional Data\
+**  State-level population estimates from 2020–2024 were retrieved from [**https://api.census.gov/data**](https://api.census.gov/data)and were merged with weekly death data to calculate per capita mortality rates. Regional classification data were parsed from a JSON file and joined with state data. Weekly observations were matched by state and year using MMWR-aligned dates, resulting in a unified dataset (datdeaths) for regional and temporal analysis.
+
+**COVID-19 Death Rates by Variant Wave and Region\
+**  Weekly deaths were categorized into six pandemic waves. For each wave and region, we calculated average weekly COVID-19 death rates per 100,000 people using population-matched data. Bar plots and line graphs visualized regional differences, while tables and faceted bar charts highlighted top states by mortality within each wave.
+
+**Temporal Trends of COVID-19 Deaths by State\
+**  We identified the top five states with the highest wave-specific death rates and plotted weekly deaths over time using faceted line plots. LOESS curves were overlaid to visualize trends, allowing comparison across states and variant periods.
+
+**Identification of Top States by Annual COVID-19 Death Rate\
+**  To highlight states most impacted annually, we computed yearly death rates per 100,000 population for each state (2020–2024). The top state per year (based on death rate) was identified and displayed in a summary table. A corresponding bar plot illustrated these top states over time, aiding in the visualization of annual mortality burdens and shifts in geographic impact.
+
+# Results
 
 ```{r}
 #getwd()
@@ -11,3 +73,29 @@ print(topstate_by_wave_v)
 print(top_state_per_year_v)
 
 ```
+
+Figure 1(top left) illustrates weekly COVID-19 death counts in the United States from 2020 through early 2025, overlaid with periods corresponding to six major variant waves. The highest peak occurred during the 1st Wave (Original strain) in late 2020 to early 2021, surpassing 100,000 weekly deaths at its peak. A secondary spike occurred during the 3rd Wave (Delta variant) in mid-to-late 2021, with a notable rise again in early 2022 during the 4th Wave (Omicron BA.1). Following this period, death counts steadily declined, with subsequent waves showing relatively smaller surges. The visualization underscores a sharp decline in mortality as newer Omicron subvariants emerged, suggesting changes in population immunity, viral virulence, or treatment efficacy over time.
+
+Figure 1(top-right)  displays a heatmap of quarterly COVID-19 deaths across U.S. states. The highest death tolls are concentrated between Q4 2020 and Q1 2022, with particularly high numbers in California, Texas, Florida, and New York during these periods. Some states in the South and West, such as Arizona, Mississippi, and Alabama, consistently showed elevated death counts across multiple quarters. After Q2 2022, COVID-19 deaths declined significantly across all states and remained at lower levels through 2024 and early 2025. This heatmap highlights temporal and geographic heterogeneity in mortality, potentially linked to health infrastructure, public health responses, and socio-demographic factors.
+
+Figure 1(bottom-left) shows the trend in COVID-19 death rates (per 100,000 people) by U.S. region across the six variant waves. The Southeast region exhibited the highest death rate during the 1st Wave, exceeding 3,900 deaths per 100,000. Although all regions experienced a general decline in death rates across waves, the South Central and Mountain States consistently reported higher mortality compared to other regions, such as New England or the Pacific Northwest. This trend suggests regional disparities in pandemic impact that persisted even as the virus evolved and vaccines became widely available.
+
+Figure 1(bottom-right) focuses on the top five states with the highest death rates per 100,000 for each wave. The affected states varied across waves, with Mississippi, Alabama, and Oklahoma appearing frequently in the top ranks. The 2nd Wave (Alpha) was notable for a shift toward northeastern states, including New Jersey and Pennsylvania. During the Delta and Omicron waves, Southern and Appalachian states, including Kentucky, West Virginia, and Tennessee, were disproportionately represented. Puerto Rico also emerged during the 5th Wave, illustrating how regional vulnerabilities extended beyond the continental U.S.
+
+# Discussion
+
+This study presents a comprehensive analysis of COVID-19 mortality in the United States from 2020 through early 2025, revealing key temporal, geographic, and variant-specific patterns, as well as shifts in disease severity and excess mortality over time. Our findings show that the overall burden of COVID-19 deaths peaked during the early stages of the pandemic and again during the Delta wave, with mortality declining substantially during the later Omicron waves. This trajectory suggests the influence of evolving viral characteristics, population-level immunity, public health interventions, and improvements in clinical management.
+
+Geographically, we observed persistent disparities in mortality throughout the pandemic. Southern and Appalachian states, along with parts of the Midwest, consistently experienced higher death rates compared to other regions. These states frequently appeared among the top five in per capita COVID-19 mortality during multiple variant waves. Factors likely contributing to these disparities include lower vaccination coverage, higher prevalence of chronic diseases, and reduced access to healthcare resources. Conversely, northeastern states, which were heavily affected in the initial wave, appeared less frequently in later waves, possibly due to early surges driving more robust public health responses or higher subsequent immunity. These trends highlight the ongoing importance of addressing structural health inequities in regional pandemic preparedness.
+
+Temporal analysis across variant waves revealed a non-linear trend in hospitalization and mortality metrics. Although hospitalizations per 1,000 cases decreased between the Original and Delta waves, they resurged during later Omicron subvariant periods, particularly BA.2 to XBB. This bimodal trend may reflect a dynamic virulence-immunity tradeoff, where the virus evolved to maintain high transmissibility despite partial immune protection in the population. In contrast, case fatality rates (CFRs) declined steadily across waves. This monotonic decline, confirmed through chi-squared comparisons and mortality rate ratios, points toward a genuine reduction in disease severity over time. Likely contributing factors include mass vaccination, earlier detection and treatment, as well as accumulated population immunity through prior infection.
+
+Still, these patterns must be interpreted within a broader public health context. Vaccination coverage increased steadily across waves and was strongly associated with lower excess mortality. However, improvements in clinical management (e.g., increased use of dexamethasone and remdesivir post-2021), greater availability of home testing during Omicron surges, and high rates of prior infection (with estimates suggesting over 58% of Americans had been infected by 2023) also likely contributed to the observed reductions in severity. These interacting factors complicate efforts to attribute mortality reductions to any single cause and underscore the need for multifaceted public health strategies.
+
+Our analysis of excess mortality adds further depth to these findings. The Delta wave and the early pandemic phase were associated with the highest percentages of excess deaths, consistent with their documented impact on hospital systems and public health infrastructure. Western states, including Arizona and New Mexico, reported some of the highest levels of excess mortality across multiple waves, while northeastern states like New Jersey more frequently appeared among those with lower relative burden. One possible explanation for this pattern is the greater healthcare capacity and urban infrastructure in the Northeast, which may have mitigated severe outcomes.
+
+Regression analysis also revealed important interactions among causes of death. COVID-19 deaths were the strongest predictor of excess mortality, but pneumonia-related deaths showed a significant interaction, suggesting that pneumonia often served as a secondary complication rather than a source of misclassification. Influenza, while statistically significant, had a negative interaction with COVID-19 mortality. This may reflect reduced influenza transmission due to social distancing or potential over-attribution of deaths to influenza during overlapping respiratory illness seasons.
+
+Several limitations should be acknowledged. First, mortality reporting lags—ranging from 2 to 8 weeks—introduce uncertainty in the temporal alignment of peaks and variant-specific waves. Additionally, the dataset did not distinguish between influenza-only deaths and those involving co-infections, possibly inflating influenza’s apparent impact. Moreover, home testing and shifts in death attribution practices may have affected both case and death reporting over time, particularly during the Omicron period.
+
+Despite these limitations, the findings provide critical insights into how the evolving virology of SARS-CoV-2, combined with public health responses and sociodemographic context, shaped the trajectory of the pandemic in the United States. Importantly, the regional and temporal heterogeneity in mortality reinforces the need for locally tailored strategies, ongoing surveillance, and adaptive public health responses. As new variants emerge, continued investment in vaccine development, equitable healthcare access, and data transparency will be crucial to managing future public health crises.

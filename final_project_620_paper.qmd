@@ -41,28 +41,28 @@ To streamline data access and ensure reproducibility, we built a custom function
 ### Visualization and Analysis of Covid-19 Deaths
 
 **Data Processing and Cleaning\
-** We used a state-level COVID-19 mortality dataset and excluded national aggregates to focus on regional and state-specific trends. Dates were converted to Date format, and MMWR week and year variables were derived using the epiyear() and epiweek() functions from the epitools package. COVID-19 death counts were converted to numeric values, and only data from January 1, 2020, onwards were retained. All variable names and formats were standardized using the janitor package to ensure consistency.
+**We used a state-level COVID-19 mortality dataset and excluded national aggregates to focus on regional and state-specific trends. Dates were converted to Date format, and MMWR week and year variables were derived using the epiyear() and epiweek() functions from the epitools package. COVID-19 death counts were converted to numeric values, and only data from January 1, 2020, onwards were retained. All variable names and formats were standardized using the janitor package to ensure consistency.
 
 **Computation of Daily and Rolling Mortality Trends\
-**  To explore national mortality trends, daily COVID-19 deaths were aggregated across states, and a 7-day rolling average was computed using the zoo package to smooth short-term fluctuations. This time series enabled identification of major waves in mortality patterns.
+**To explore national mortality trends, daily COVID-19 deaths were aggregated across states, and a 7-day rolling average was computed using the zoo package to smooth short-term fluctuations. This time series enabled identification of major waves in mortality patterns.
 
 **Wave Classification and Variant Overlay\
-**  We manually defined six distinct pandemic waves corresponding to dominant SARS-CoV-2 variants based on CDC reports and literature. These wave periods were labeled using the tibble package and overlaid as shaded intervals onto national mortality plots using ggplot2::geom_rect() alongside the rolling average trend line.
+**We manually defined six distinct pandemic waves corresponding to dominant SARS-CoV-2 variants based on CDC reports and literature. These wave periods were labeled using the tibble package and overlaid as shaded intervals onto national mortality plots using ggplot2::geom_rect() alongside the rolling average trend line.
 
 **State-Level Quarterly Mortality Visualization\
-**  We created a heatmap of state-level COVID-19 deaths by calendar quarter to explore geographic variation. Weekly data were aggregated to state-quarters using lubridate::quarter() and visualized with geom_tile() and the viridis::magma color scale, enabling comparison across regions and time.
+**We created a heatmap of state-level COVID-19 deaths by calendar quarter to explore geographic variation. Weekly data were aggregated to state-quarters using lubridate::quarter() and visualized with geom_tile() and the viridis::magma color scale, enabling comparison across regions and time.
 
 **Integration of Population and Regional Data\
-**  State-level population estimates from 2020–2024 were retrieved from [**https://api.census.gov/data**](https://api.census.gov/data)and were merged with weekly death data to calculate per capita mortality rates. Regional classification data were parsed from a JSON file and joined with state data. Weekly observations were matched by state and year using MMWR-aligned dates, resulting in a unified dataset (datdeaths) for regional and temporal analysis.
+**State-level population estimates from 2020–2024 were retrieved from [**https://api.census.gov/data**](https://api.census.gov/data)and were merged with weekly death data to calculate per capita mortality rates. Regional classification data were parsed from a JSON file and joined with state data. Weekly observations were matched by state and year using MMWR-aligned dates, resulting in a unified dataset (datdeaths) for regional and temporal analysis.
 
 **COVID-19 Death Rates by Variant Wave and Region\
-**  Weekly deaths were categorized into six pandemic waves. For each wave and region, we calculated average weekly COVID-19 death rates per 100,000 people using population-matched data. Bar plots and line graphs visualized regional differences, while tables and faceted bar charts highlighted top states by mortality within each wave.
+**Weekly deaths were categorized into six pandemic waves. For each wave and region, we calculated average weekly COVID-19 death rates per 100,000 people using population-matched data. Bar plots and line graphs visualized regional differences, while tables and faceted bar charts highlighted top states by mortality within each wave.
 
 **Temporal Trends of COVID-19 Deaths by State\
-**  We identified the top five states with the highest wave-specific death rates and plotted weekly deaths over time using faceted line plots. LOESS curves were overlaid to visualize trends, allowing comparison across states and variant periods.
+**We identified the top five states with the highest wave-specific death rates and plotted weekly deaths over time using faceted line plots. LOESS curves were overlaid to visualize trends, allowing comparison across states and variant periods.
 
 **Identification of Top States by Annual COVID-19 Death Rate\
-**  To highlight states most impacted annually, we computed yearly death rates per 100,000 population for each state (2020–2024). The top state per year (based on death rate) was identified and displayed in a summary table. A corresponding bar plot illustrated these top states over time, aiding in the visualization of annual mortality burdens and shifts in geographic impact.
+**To highlight states most impacted annually, we computed yearly death rates per 100,000 population for each state (2020–2024). The top state per year (based on death rate) was identified and displayed in a summary table. A corresponding bar plot illustrated these top states over time, aiding in the visualization of annual mortality burdens and shifts in geographic impact.
 
 # Results
 
@@ -71,6 +71,9 @@ To streamline data access and ensure reproducibility, we built a custom function
 source("./code/finalprojectcode.R")
 print(topstate_by_wave_v)
 print(top_state_per_year_v)
+print(hosp_plot_msr)
+print(cfr_plot_msr)
+print(vax_plot_msr)
 
 ```
 

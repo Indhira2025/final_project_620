@@ -11,10 +11,6 @@ suppressPackageStartupMessages(library(tidyverse))
 
 ##Retreving Data from cdc Website for covid cases, deaths, hospitalizations and ##vaccines
 
-while (dev.cur() > 1) {
-  dev.off()
-}
-
 get_cdc_data_v <- function(endpoint) {
   api_url <- paste0("https://data.cdc.gov/resource/", endpoint, ".json")
   
@@ -1241,6 +1237,41 @@ exp_v_unexp <- ggplot(resp_analysis, aes(x = MMWRweek2Date(MMWRyear = year, MMWR
     y = " % Unexplained Excess Deaths Accounted For"
   ) +
   theme_minimal()
+---
+title: "Excess Mortality Analysis"
+format: html
+editor: visual
+---
+
+### States Most Frequently / Least Frequently in Top 5 for Excess Deaths
+
+```{r}
+mean_excess_yr <- excess_death %>%
+  mutate(mmwr_year = epiyear(week_ending_date)) %>%
+  group_by(mmwr_year, state) %>%
+  summarize(mean_percent_change = 100 * mean(excess_deaths) / mean(expected_deaths), .groups = "drop")
+
+top_5_yr <- mean_excess_yr %>%
+  group_by(mmwr_year) %>%
+  slice_max(mean_percent_change, n = 5, with_ties = FALSE) %>%
+  ungroup() %>%
+  group_by(state) %>%
+  summarize(years_in_top5 = n(), top_years = paste(sort(unique(mmwr_year)), collapse = ", "))
+
+top_5_yr <- top_5_yr %>%
+  mutate(top_years_wrapped = gsub("^((?:[^,]+, ){2}[^,]+),\\s*", "\\1\n", top_years))
+
+top_bar5 <- top_5_yr %>%
+  slice_max(years_in_top5, n = 5, with_ties = FALSE) %>%
+  ggplot(aes(x = reorder(state, years_in_top5), y = years_in_top5)) +
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = top_years_wrapped), hjust = -0.1, size = 3) +
+  labs(title = "States Most Frequently in the Top 5 for % Excess Mortality (2020-2025)",
+       x = "State", y = "Years in Top 5") +
+  coord_flip() +
+  theme_minimal() +
+  ylim(0, max(top_5_yr$years_in_top5) + 1)
+top_bar5
 
 
 

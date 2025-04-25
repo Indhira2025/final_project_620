@@ -8,7 +8,7 @@ editor: visual
 
 Indhira Vadivel, Isha Khapre, Medha Rao
 
-# Abstract 
+# Abstract
 
 ---
 title: "Impact of COVID-19 on Mortality in the United States: A Temporal and Regional Analysis"
@@ -95,7 +95,7 @@ To streamline data access and ensure reproducibility, we built a custom function
 **Identification of Top States by Annual COVID-19 Death Rate\
 **To highlight states most impacted annually, we computed yearly death rates per 100,000 population for each state (2020–2024). The top state per year (based on death rate) was identified and displayed in a summary table. A corresponding bar plot illustrated these top states over time, aiding in the visualization of annual mortality burdens and shifts in geographic impact.
 
-## Excess Deaths Analysis 
+## Excess Deaths Analysis
 
 We analyzed excess mortality during COVID-19 using CDC data on weekly deaths, vaccinations, and NCHS records on pneumonia and influenza from 2013–2020. Our goals included assessing respiratory illness and vaccination impacts, examining temporal and regional mortality trends, and evaluating COVID-19's role in unexplained deaths.
 
@@ -113,16 +113,13 @@ $$
 
 Rows with missing expected death data were excluded.
 
-Excess deaths were calculated as: 
-$$
+Excess deaths were calculated as: $$
 \text{Excess Deaths} = \text{Total Deaths} - \text{Expected Deaths}
 $$
 
-Standardized Excess Deaths were calculated as: 
-$$
+Standardized Excess Deaths were calculated as: $$
 \%\ \text{Change} = \left( \frac{\text{Excess Deaths}}{\text{Expected Deaths}} \right) \times 100
-$$
-Excess deaths were changed to % Change in Expected Deaths (% Excess Mortality), so that they could be compared relatively. 
+$$ Excess deaths were changed to % Change in Expected Deaths (% Excess Mortality), so that they could be compared relatively.
 
 ### Temporal & Regional Trends
 
@@ -130,8 +127,7 @@ Using `ggplot2`, we visualized weekly % excess deaths by region (Northeast, Sout
 
 ### Top/Bottom 5 States by Excess Mortality
 
-We identified states most frequently in the top and bottom 5 for % excess mortality by year (using `epiyear`) on the week_ending_date column. The average percent change in expected mortality was calculated for each year with the formula: 
-$$
+We identified states most frequently in the top and bottom 5 for % excess mortality by year (using `epiyear`) on the week_ending_date column. The average percent change in expected mortality was calculated for each year with the formula: $$
 \%\ \text{Change in Expected Deaths} = \left( \frac{\text{Average Excess Deaths}}{\text{Average Expected Deaths}} \right) \times 100
 $$
 
@@ -145,17 +141,15 @@ $$
 \text{Excess Deaths}_i = \beta_0 + \beta_1 \cdot \text{COVID-19 Deaths}_i
 $$
 
-Non-COVID excess deaths were calculated and plotted where excess deaths > 0.
+Non-COVID excess deaths were calculated and plotted where excess deaths \> 0.
 
 ### Data Harmonization & Merging
 
 Vaccination data was aggregated weekly by state. Dates, week numbers, and year labels were cleaned. State abbreviations were expanded. The data was merged with the death dataset by year, week, and state.
 
-Deaths from pneumonia alone were computed:
-$$
+Deaths from pneumonia alone were computed: $$
 \text{Pneumonia-Only Deaths} = \text{Pneumonia Deaths} - (\text{Pneumonia + COVID-19 Deaths})
 $$
-
 
 ### Multivariate Modeling
 
@@ -165,29 +159,26 @@ $$
 \text{Excess Deaths}_i = \beta_0 + \beta_1 \cdot \text{COVID}_i + \beta_2 \cdot \text{Pneumonia}_i + \beta_3 \cdot \text{Influenza}_i + \beta_4 \cdot \text{Vaccinations}_i + \beta_5 \cdot (\text{Pneumonia}_i \times \text{COVID}_i) + \beta_6 \cdot (\text{Influenza}_i \times \text{COVID}_i)
 $$
 
-Since vaccination data was only upto May 2023, we only fit the MLR on 2020-2023 data. 
-
+Since vaccination data was only upto May 2023, we only fit the MLR on 2020-2023 data.
 
 Model outputs were formatted with `broom::tidy()`.
 
-### Hidden COVID-19 Burden in Pneumonia 
+### Hidden COVID-19 Burden in Pneumonia
 
 We used NCHS data (2013–2019) to estimate expected pneumonia deaths for 2020–2025. Weekly comparisons were plotted alongside historical averages.
 
 Residuals were calculated:
 
-- **COVID-only residual**: unexplained excess deaths after accounting for COVID-19 deaths.
-- **COVID + Pneumonia residual**: residual after also accounting for pneumonia deaths.
-- **% Improvement** = $$
-\left( \frac{\text{COVID-only residual} - \text{COVID + Pneumonia residual}}{\text{COVID-only residual}} \right) \times 100$$
-
+-   **COVID-only residual**: unexplained excess deaths after accounting for COVID-19 deaths.
+-   **COVID + Pneumonia residual**: residual after also accounting for pneumonia deaths.
+-   **% Improvement** = $$
+    \left( \frac{\text{COVID-only residual} - \text{COVID + Pneumonia residual}}{\text{COVID-only residual}} \right) \times 100$$
 
 These residuals were visualized over time to assess pneumonia’s explanatory power in COVID-era excess mortality.
 
-
 # Results
 
-### Figure 1 
+### Figure 1
 
 ```{r}
 #getwd()
@@ -213,6 +204,7 @@ Figure 1(bottom-left) shows the trend in COVID-19 death rates (per 100,000 peopl
 Figure 1(bottom-right) focuses on the top five states with the highest death rates per 100,000 for each wave. The affected states varied across waves, with Mississippi, Alabama, and Oklahoma appearing frequently in the top ranks. The 2nd Wave (Alpha) was notable for a shift toward northeastern states, including New Jersey and Pennsylvania. During the Delta and Omicron waves, Southern and Appalachian states, including Kentucky, West Virginia, and Tennessee, were disproportionately represented. Puerto Rico also emerged during the 5th Wave, illustrating how regional vulnerabilities extended beyond the continental U.S.
 
 ### Figure X
+
 ```{r, echo = FALSE}
 library(gridExtra)
 library(grid)
@@ -226,13 +218,15 @@ grid.arrange(
 Figure X presents visualizations (A–D with A being the left top, B being the right top, C being the bottom left, and D being the bottom right) of excess mortality trends across U.S. regions during the COVID-19 pandemic. Panel A shows a similar trend in excess mortality across regions, with the Northeast experiencing a sharp early spike in 2020, followed by lower excess deaths compared to other regions. The West had slightly higher excess deaths on average. Loess smoothing revealed national peaks in December 2020 and 2021, aligning with major COVID-19 surges. Panel B highlights these spikes, particularly during the early 2020 and Delta waves. Panels C and D show states most frequently in the top and bottom five for excess mortality. Arizona and New Mexico were often in the top five, while New Jersey appeared in the bottom five four out of six years, indicating lower excess mortality.
 
 ### Table 1
+
 ```{r}
 relabelled_table 
 ```
 
-The multiple linear regression model showed a strong fit, with an Adjusted R² of 0.8239 and a p-value of p < 2.2 × 10⁻¹⁶, indicating that over 82% of the variance in excess deaths was explained by the predictors. COVID-19 deaths were a significant positive predictor (β = 0.868, p < 2 × 10⁻¹⁶), underscoring the pandemic's central role in excess mortality. Pneumonia deaths also significantly contributed (β = 0.964, p < 2 × 10⁻¹⁶), with a significant positive interaction term between pneumonia and COVID-19 deaths (β = 0.00113, p < 2 × 10⁻¹⁶). Influenza deaths were a positive predictor (β = 2.082, p = 3.84 × 10⁻⁸), though the interaction with COVID-19 deaths was negative and marginally significant (β = –0.00357, p = 0.0405), suggesting potential redundancy or overcounting in death certifications. Vaccination rates were negatively associated with excess mortality (β = –1.27 × 10⁻⁴, p < 2 × 10⁻¹⁶), indicating a protective effect. These results highlight the significant roles of COVID-19, pneumonia, and influenza in excess mortality, with vaccinations helping to reduce deaths, and suggest potential misclassification of some COVID-19 deaths as pneumonia.
+The multiple linear regression model showed a strong fit, with an Adjusted R² of 0.8239 and a p-value of p \< 2.2 × 10⁻¹⁶, indicating that over 82% of the variance in excess deaths was explained by the predictors. COVID-19 deaths were a significant positive predictor (β = 0.868, p \< 2 × 10⁻¹⁶), underscoring the pandemic's central role in excess mortality. Pneumonia deaths also significantly contributed (β = 0.964, p \< 2 × 10⁻¹⁶), with a significant positive interaction term between pneumonia and COVID-19 deaths (β = 0.00113, p \< 2 × 10⁻¹⁶). Influenza deaths were a positive predictor (β = 2.082, p = 3.84 × 10⁻⁸), though the interaction with COVID-19 deaths was negative and marginally significant (β = –0.00357, p = 0.0405), suggesting potential redundancy or overcounting in death certifications. Vaccination rates were negatively associated with excess mortality (β = –1.27 × 10⁻⁴, p \< 2 × 10⁻¹⁶), indicating a protective effect. These results highlight the significant roles of COVID-19, pneumonia, and influenza in excess mortality, with vaccinations helping to reduce deaths, and suggest potential misclassification of some COVID-19 deaths as pneumonia.
 
 ### Figure Y
+
 ```{r}
 grid.arrange(
   linreg_diff, excess_notcovid, 
@@ -241,31 +235,24 @@ grid.arrange(
 )
 ```
 
-Figure Y explores the relationship between COVID-19 deaths, excess mortality, and pneumonia-related mortality across the pandemic timeline (A–D with A being the left top, B being the right top, C being the bottom left, and D being the bottom right). Panel A demonstrates a clear positive association between weekly COVID-19 deaths and excess mortality. This suggests that increases in reported COVID-19 deaths were strongly aligned with increases in total excess deaths, supporting COVID-19 as a prominent driver of excess mortality during the pandemic. Panel B reveals that, on average, a substantial proportion of excess deaths were not directly attributed to COVID-19 deaths alone. This gap indicates that official COVID-19 death counts may underrepresent the true mortality burden of the pandemic, due to indirect effects or potential misclassification of cause of death. Panel C shows the number of positive excess pneumonia deaths compared to historical expectations across 2020-2025. Instances where pneumonia mortality exceeded expected levels were treated as possible indicators of misclassification of covid-19 as pneumonia or death by pneumonia as a secondary effect of covid-19. These discrepancies were most apparent in early 2020, prior to widespread testing, and at the end of 2022. Panel D further evaluates the impact of pneumonia-related mortality on overall excess deaths as a potential source of COVID-19 misclassification and residual excess deaths. While pneumonia deaths appeared elevated at certain points, they did not account for the majority of unexplained excess mortality. 
-
+Figure Y explores the relationship between COVID-19 deaths, excess mortality, and pneumonia-related mortality across the pandemic timeline (A–D with A being the left top, B being the right top, C being the bottom left, and D being the bottom right). Panel A demonstrates a clear positive association between weekly COVID-19 deaths and excess mortality. This suggests that increases in reported COVID-19 deaths were strongly aligned with increases in total excess deaths, supporting COVID-19 as a prominent driver of excess mortality during the pandemic. Panel B reveals that, on average, a substantial proportion of excess deaths were not directly attributed to COVID-19 deaths alone. This gap indicates that official COVID-19 death counts may underrepresent the true mortality burden of the pandemic, due to indirect effects or potential misclassification of cause of death. Panel C shows the number of positive excess pneumonia deaths compared to historical expectations across 2020-2025. Instances where pneumonia mortality exceeded expected levels were treated as possible indicators of misclassification of covid-19 as pneumonia or death by pneumonia as a secondary effect of covid-19. These discrepancies were most apparent in early 2020, prior to widespread testing, and at the end of 2022. Panel D further evaluates the impact of pneumonia-related mortality on overall excess deaths as a potential source of COVID-19 misclassification and residual excess deaths. While pneumonia deaths appeared elevated at certain points, they did not account for the majority of unexplained excess mortality.
 
 # Discussion
 
-This study presents a comprehensive analysis of COVID-19 mortality in the United States from 2020 through early 2025, revealing key temporal, geographic, and variant-specific patterns, as well as shifts in disease severity and excess mortality over time. Our findings show that the overall burden of COVID-19 deaths peaked during the early stages of the pandemic and again during the Delta wave, with mortality declining substantially during the later Omicron waves. This trajectory suggests the influence of evolving viral characteristics, population-level immunity, public health interventions, and improvements in clinical management.
-Geographically, we observed persistent disparities in mortality throughout the pandemic. Southern and Appalachian states, along with parts of the Midwest, consistently experienced higher death rates compared to other regions. These states frequently appeared among the top five in per capita COVID-19 mortality during multiple variant waves. Factors likely contributing to these disparities include lower vaccination coverage, higher prevalence of chronic diseases, and reduced access to healthcare resources. Conversely, northeastern states, which were heavily affected in the initial wave, appeared less frequently in later waves, possibly due to early surges driving more robust public health responses or higher subsequent immunity. These trends highlight the ongoing importance of addressing structural health inequities in regional pandemic preparedness.
-Temporal analysis across variant waves revealed a non-linear trend in hospitalization and mortality metrics. Although hospitalizations per 1,000 cases decreased between the Original and Delta waves, they resurged during later Omicron subvariant periods, particularly BA.2 to XBB. This bimodal trend may reflect a dynamic virulence-immunity tradeoff, where the virus evolved to maintain high transmissibility despite partial immune protection in the population. In contrast, case fatality rates (CFRs) declined steadily across waves. This monotonic decline, confirmed through chi-squared comparisons and mortality rate ratios, points toward a genuine reduction in disease severity over time. Likely contributing factors include mass vaccination, earlier detection and treatment, as well as accumulated population immunity through prior infection.
-Still, these patterns must be interpreted within a broader public health context. Vaccination coverage increased steadily across waves and was strongly associated with lower excess mortality. However, improvements in clinical management (e.g., increased use of dexamethasone and remdesivir post-2021), greater availability of home testing during Omicron surges, and high rates of prior infection (with estimates suggesting over 58% of Americans had been infected by 2023) also likely contributed to the observed reductions in severity. These interacting factors complicate efforts to attribute mortality reductions to any single cause and underscore the need for multifaceted public health strategies.
-Our analysis of excess mortality adds further depth to these findings. The Delta wave and the early pandemic phase were associated with the highest percentages of excess deaths, consistent with their documented impact on hospital systems and public health infrastructure  (Tabatabai M et al. 2023). Western states, including Arizona and New Mexico, reported some of the highest levels of excess mortality across multiple waves, while northeastern states like New Jersey more frequently appeared among those with lower relative burden. One possible explanation for this pattern is the greater healthcare capacity in urban versus rural areas of the Northeast, which may have mitigated severe outcomes (Crankshaw, K 2023).
-Regression analysis also revealed important interactions among causes of death. COVID-19 deaths were the strongest predictor of excess mortality, but pneumonia-related deaths showed a significant interaction, suggesting that pneumonia often served as a secondary complication rather than a source of misclassification. Influenza, while statistically significant, had a negative interaction with COVID-19 mortality. This may reflect reduced influenza transmission due to social distancing or potential over-attribution of deaths to influenza during overlapping respiratory illness seasons.
-Several limitations should be acknowledged. First, mortality reporting lags—ranging from 2 to 8 weeks—introduce uncertainty in the temporal alignment of peaks and variant-specific waves. Additionally, the dataset did not distinguish between influenza-only deaths and those involving co-infections, possibly inflating influenza’s apparent impact. Moreover, home testing and shifts in death attribution practices may have affected both case and death reporting over time, particularly during the Omicron period.
-Despite these limitations, the findings provide critical insights into how the evolving virology of SARS-CoV-2, combined with public health responses and sociodemographic context, shaped the trajectory of the pandemic in the United States. Importantly, the regional and temporal heterogeneity in mortality reinforces the need for locally tailored strategies, ongoing surveillance, and adaptive public health responses. As new variants emerge, continued investment in vaccine development, equitable healthcare access, and data transparency will be crucial to managing future public health crises.
+This study presents a comprehensive analysis of COVID-19 mortality in the United States from 2020 through early 2025, revealing key temporal, geographic, and variant-specific patterns, as well as shifts in disease severity and excess mortality over time. Our findings show that the overall burden of COVID-19 deaths peaked during the early stages of the pandemic and again during the Delta wave, with mortality declining substantially during the later Omicron waves. This trajectory suggests the influence of evolving viral characteristics, population-level immunity, public health interventions, and improvements in clinical management. Geographically, we observed persistent disparities in mortality throughout the pandemic. Southern and Appalachian states, along with parts of the Midwest, consistently experienced higher death rates compared to other regions. These states frequently appeared among the top five in per capita COVID-19 mortality during multiple variant waves. Factors likely contributing to these disparities include lower vaccination coverage, higher prevalence of chronic diseases, and reduced access to healthcare resources. Conversely, northeastern states, which were heavily affected in the initial wave, appeared less frequently in later waves, possibly due to early surges driving more robust public health responses or higher subsequent immunity. These trends highlight the ongoing importance of addressing structural health inequities in regional pandemic preparedness. Temporal analysis across variant waves revealed a non-linear trend in hospitalization and mortality metrics. Although hospitalizations per 1,000 cases decreased between the Original and Delta waves, they resurged during later Omicron subvariant periods, particularly BA.2 to XBB. This bimodal trend may reflect a dynamic virulence-immunity tradeoff, where the virus evolved to maintain high transmissibility despite partial immune protection in the population. In contrast, case fatality rates (CFRs) declined steadily across waves. This monotonic decline, confirmed through chi-squared comparisons and mortality rate ratios, points toward a genuine reduction in disease severity over time. Likely contributing factors include mass vaccination, earlier detection and treatment, as well as accumulated population immunity through prior infection. Still, these patterns must be interpreted within a broader public health context. Vaccination coverage increased steadily across waves and was strongly associated with lower excess mortality. However, improvements in clinical management (e.g., increased use of dexamethasone and remdesivir post-2021), greater availability of home testing during Omicron surges, and high rates of prior infection (with estimates suggesting over 58% of Americans had been infected by 2023) also likely contributed to the observed reductions in severity. These interacting factors complicate efforts to attribute mortality reductions to any single cause and underscore the need for multifaceted public health strategies. Our analysis of excess mortality adds further depth to these findings. The Delta wave and the early pandemic phase were associated with the highest percentages of excess deaths, consistent with their documented impact on hospital systems and public health infrastructure (Tabatabai M et al. 2023). Western states, including Arizona and New Mexico, reported some of the highest levels of excess mortality across multiple waves, while northeastern states like New Jersey more frequently appeared among those with lower relative burden. One possible explanation for this pattern is the greater healthcare capacity in urban versus rural areas of the Northeast, which may have mitigated severe outcomes (Crankshaw, K 2023). Regression analysis also revealed important interactions among causes of death. COVID-19 deaths were the strongest predictor of excess mortality, but pneumonia-related deaths showed a significant interaction, suggesting that pneumonia often served as a secondary complication rather than a source of misclassification. Influenza, while statistically significant, had a negative interaction with COVID-19 mortality. This may reflect reduced influenza transmission due to social distancing or potential over-attribution of deaths to influenza during overlapping respiratory illness seasons. Several limitations should be acknowledged. First, mortality reporting lags—ranging from 2 to 8 weeks—introduce uncertainty in the temporal alignment of peaks and variant-specific waves. Additionally, the dataset did not distinguish between influenza-only deaths and those involving co-infections, possibly inflating influenza’s apparent impact. Moreover, home testing and shifts in death attribution practices may have affected both case and death reporting over time, particularly during the Omicron period. Despite these limitations, the findings provide critical insights into how the evolving virology of SARS-CoV-2, combined with public health responses and sociodemographic context, shaped the trajectory of the pandemic in the United States. Importantly, the regional and temporal heterogeneity in mortality reinforces the need for locally tailored strategies, ongoing surveillance, and adaptive public health responses. As new variants emerge, continued investment in vaccine development, equitable healthcare access, and data transparency will be crucial to managing future public health crises.
 
 ## Citations
-- Woolf, S. H., Chapman, D. A., Sabo, R. T., Zimmerman, E. B. (2020). Excess Deaths From COVID-19 and Other Causes, March–July 2020. *JAMA*. https://doi.org/10.1001/jama.2020.19545
 
-- Faust, J. S., Du, C., Renton, B., Lin, Z., Krumholz, H. M. (2023). Excess Mortality in the United States During the First Three Years of the COVID-19 Pandemic. *Lancet Regional Health – Americas*.
+-   Woolf, S. H., Chapman, D. A., Sabo, R. T., Zimmerman, E. B. (2020). Excess Deaths From COVID-19 and Other Causes, March–July 2020. *JAMA*. https://doi.org/10.1001/jama.2020.19545
 
-- Johns Hopkins University Coronavirus Resource Center (until its shutdown in 2023). *Global and U.S.-specific COVID-19 statistics, including testing, vaccination, and mortality.* https://coronavirus.jhu.edu/
+-   Faust, J. S., Du, C., Renton, B., Lin, Z., Krumholz, H. M. (2023). Excess Mortality in the United States During the First Three Years of the COVID-19 Pandemic. *Lancet Regional Health – Americas*.
 
-- Our World in Data. *Global and U.S.-specific COVID-19 statistics, including testing, vaccination, and mortality.* https://ourworldindata.org/coronavirus
+-   Johns Hopkins University Coronavirus Resource Center (until its shutdown in 2023). *Global and U.S.-specific COVID-19 statistics, including testing, vaccination, and mortality.* https://coronavirus.jhu.edu/
 
-- The New York Times COVID-19 Data Archive. https://github.com/nytimes/covid-19-data
+-   Our World in Data. *Global and U.S.-specific COVID-19 statistics, including testing, vaccination, and mortality.* https://ourworldindata.org/coronavirus
 
-- Tabatabai, M., Juarez, P. D., Matthews-Juarez, P., Wilus, D. M., Ramesh, A., Alcendor, D. J., Tabatabai, N., & Singh, K. P. (2023). An Analysis of COVID-19 Mortality During the Dominancy of Alpha, Delta, and Omicron in the USA. *J Prim Care Community Health*, 14, 21501319231170164. https://doi.org/10.1177/21501319231170164. PMID: 37083205; PMCID: PMC10125879.
+-   The New York Times COVID-19 Data Archive. https://github.com/nytimes/covid-19-data
 
-- Crankshaw, K. (2023, June 27). The South had highest disability rate among regions in 2021. *Census.gov*. https://www.census.gov/library/stories/2023/06/disability-rates-higher-in-rural-areas-than-urban-areas.html
+-   Tabatabai, M., Juarez, P. D., Matthews-Juarez, P., Wilus, D. M., Ramesh, A., Alcendor, D. J., Tabatabai, N., & Singh, K. P. (2023). An Analysis of COVID-19 Mortality During the Dominancy of Alpha, Delta, and Omicron in the USA. *J Prim Care Community Health*, 14, 21501319231170164. https://doi.org/10.1177/21501319231170164. PMID: 37083205; PMCID: PMC10125879.
+
+-   Crankshaw, K. (2023, June 27). The South had highest disability rate among regions in 2021. *Census.gov*. https://www.census.gov/library/stories/2023/06/disability-rates-higher-in-rural-areas-than-urban-areas.html

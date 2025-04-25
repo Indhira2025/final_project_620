@@ -178,6 +178,7 @@ plot4_v <- ggplot(deaths_quarterly_v, aes(x = quarter, y = state, fill = total_d
 
 ## Reteriving the population of US states form Census website
 
+
 library(jsonlite)
 library(purrr)
 library(tidyverse)
@@ -200,7 +201,7 @@ population_v <- population_v %>%
   as_tibble()
 #head(population_v)
 
-pop_latest_v<- read.csv("data/population_estimate_census.csv")
+pop_latest_v<- read.csv("C:/Users/indhi/Documents/final_project_620/data/population_estimate_census.csv")
 #head(pop_latest)
 pop_latest_new2_v <- pop_latest_v %>%
   mutate(

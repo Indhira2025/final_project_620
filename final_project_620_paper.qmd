@@ -72,6 +72,7 @@ source("./code/finalprojectcode.R")
 print(topstate_by_wave_v)
 print(top_state_per_year_v)
 
+
 ```
 
 Figure 1(top left) illustrates weekly COVID-19 death counts in the United States from 2020 through early 2025, overlaid with periods corresponding to six major variant waves. The highest peak occurred during the 1st Wave (Original strain) in late 2020 to early 2021, surpassing 100,000 weekly deaths at its peak. A secondary spike occurred during the 3rd Wave (Delta variant) in mid-to-late 2021, with a notable rise again in early 2022 during the 4th Wave (Omicron BA.1). Following this period, death counts steadily declined, with subsequent waves showing relatively smaller surges. The visualization underscores a sharp decline in mortality as newer Omicron subvariants emerged, suggesting changes in population immunity, viral virulence, or treatment efficacy over time.

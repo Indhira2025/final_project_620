@@ -446,7 +446,7 @@ top_state_per_year_v <- datdeaths_v %>%
     Population = total_population,
     Death_rate_per_100k = death_rate_per_100k
   ) %>%
-  kable(caption = "Table 2: Summary - States with highest death rate (by year)")
+  kable(caption = "Table 1: Summary - States with highest death rate (by year)")
 
 top_state_per_year_v
 
@@ -542,3 +542,5 @@ myplot_v <- suppressMessages(suppressWarnings(
 myplot_v
 
 ggsave("docs/myplot_v.pdf", plot = myplot_v, width = 6, height = 4)
+ggsave("docs/myplot_v.png", plot = myplot_v, width = 6, height = 4)
+

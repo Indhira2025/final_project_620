@@ -1,0 +1,6 @@
+"0",""
+"0","ggplot(dat_rates, aes(x = date, y = deaths_rate, color = region_name)) +"
+"0","  geom_line(alpha = 0.7) +"
+"0","  labs(title = ""COVID-19 Deaths per 100,000 People"", x = ""Date"",y = ""Deaths per 100,000"", color = ""Region"""
+"0","  )"
+"0",""

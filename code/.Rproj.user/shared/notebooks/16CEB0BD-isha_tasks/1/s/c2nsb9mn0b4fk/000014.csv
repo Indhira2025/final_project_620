@@ -1,0 +1,5 @@
+"0","predict(lm(total_deaths ~ state + mmwr_week, data = pre_covid_death1), covid_deaths1 %>% select(state, mmwr_week))
+"
+"2","Error in model.frame.default(Terms, newdata, na.action = na.action, xlev = object$xlevels) : 
+  factor mmwr_week has new levels 53
+"

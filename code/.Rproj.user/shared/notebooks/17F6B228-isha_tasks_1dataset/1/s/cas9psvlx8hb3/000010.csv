@@ -1,0 +1,5 @@
+"0","excess_avg <- covid_deaths1 %>% mutate(mmwr_week = as.integer(mmwr_week), total_deaths = as.numeric(total_deaths), percent_of_expected_deaths = as.numeric(percent_of_expected_deaths)) %>% "
+"0","  left_join(expected_deaths, by = c(""state"", ""mmwr_week"")) %>%"
+"0","  mutate(expected_deaths = total_deaths/(percent_of_expected_deaths/100), excess_deaths = total_deaths - expected_deaths )"
+"0",""
+"0","excess_avg"

@@ -1,0 +1,2 @@
+"0","diff_death_IK <- excess_death %>% mutate(diff_death = excess_deaths - covid_19_deaths) %>% filter(excess_deaths >=0)"
+"0","diff_death_IK %>% ggplot(aes(x = covid_19_deaths, y = diff_death)) + geom_point() + geom_hline(yintercept = 0, color = ""red"") + labs(x = ""Deaths by Covid-19"", y = ""Difference in Excess and Covid-19 Deaths"") + theme_minimal()"

@@ -1,0 +1,12 @@
+"0",""
+"0","ggplot(resp_analysis, aes(x = MMWRweek2Date(MMWRyear = year, MMWRweek = mmwr_week))) +"
+"0","  geom_line(aes(y = residual_difference), color = ""red"", size = 1.2) +"
+"0","  geom_hline(yintercept = 0, linetype = ""dotted"", color = ""black"") +"
+"0","  labs("
+"0","    title = ""Impact of Including Pneumonia Deaths on Excess Mortality Estimates"","
+"0","    x = ""Week"","
+"0","    y = "" % Unexplained Excess Deaths Accounted For"""
+"0","  ) +"
+"0","  theme_minimal()"
+"2","Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+Please use `linewidth` instead."

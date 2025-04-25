@@ -7,10 +7,13 @@ library(scales)
 suppressPackageStartupMessages(library(knitr))
 suppressPackageStartupMessages(library(tidyverse))
 
-
 ##setwd("C:/Users/indhi/Documents/final_project_620")
-getwd()
+
 ##Retreving Data from cdc Website for covid cases, deaths, hospitalizations and ##vaccines
+
+while (dev.cur() > 1) {
+  dev.off()
+}
 
 get_cdc_data_v <- function(endpoint) {
   api_url <- paste0("https://data.cdc.gov/resource/", endpoint, ".json")
@@ -541,7 +544,7 @@ myplot_v <- suppressMessages(suppressWarnings(
 ))
 myplot_v
 
-ggsave("docs/myplot_v.pdf", plot = myplot_v, width = 6, height = 4)
+#ggsave("docs/myplot_v.pdf", plot = myplot_v, width = 6, height = 4)
 
 
 
@@ -648,6 +651,8 @@ clean_msr_population <- population_msr %>%
     Year = as.integer(Year), 
     Population = as.numeric(Population)
   )
+
+
 
 state_abbreviations <- c(state.abb, "DC", "PR")
 state_names <- c(state.name, "District of Columbia", "Puerto Rico")
@@ -970,4 +975,273 @@ print(Death_Rate_Sequential_Test)
 
 
 # Isha Code here: 
+## Data 
+
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(tidyverse)
+library(broom)
+library(knitr)
+library(MMWRweek)
+library(gganimate)
+deaths_raw_IK <- get_cdc_data_msr("r8kw-7aab")
+vax_raw_IK <- get_cdc_data_msr("rh2h-3yt2")
+
+
+#Pre-Processing and Data Exploration 
+
+
+covid_deaths_IK <- deaths_raw_IK %>%
+  mutate(week_ending_date = as.Date(week_ending_date),
+         start_date = as.Date(start_date),
+         end_date = as.Date(end_date)) %>%
+  filter(group == "By Week", !is.na(total_deaths), !state %in% c("United States", "Puerto Rico", "District of Columbia", "New York City"),!is.na(covid_19_deaths)) %>% select(-c(group, month, data_as_of, footnote))
+
+
+
+## Expected Excess Deaths Calculation
+
+excess_death <- covid_deaths_IK %>% mutate(mmwr_week = as.integer(mmwr_week), total_deaths = as.numeric(total_deaths), covid_19_deaths = as.numeric(covid_19_deaths), percent_of_expected_deaths = as.numeric(percent_of_expected_deaths)) %>% 
+  mutate(expected_deaths = total_deaths/(percent_of_expected_deaths/100), excess_deaths = total_deaths - expected_deaths, percent_change = (excess_deaths/expected_deaths)*100) %>% filter(!is.na(expected_deaths))
+
+excess_death
+
+
+## Data Visualizations 
+### Excess Death Over Time/State & Against Covid-19 Waves 
+
+# ggplot(excess_death, aes(x = week_ending_date, y = percent_change)) + geom_line() + labs(title = "Excess Deaths (%) by Week", y = "% Excess Mortality", x = "Week") + facet_wrap(~state) 
+
+excess_death <- excess_death %>% 
+  mutate(region = state.region[match(state, state.name)])
+
+regions_loess <- ggplot(excess_death, aes(x = week_ending_date, y = percent_change, color = region)) + geom_line(alpha = 0.4) + labs(title = "Excess Deaths (%) by Week and Region", y = "% Excess Mortality", x = "Week") +  geom_smooth(se = FALSE, method = "loess", span = 0.3, color = "black") + theme_minimal()
+
+loess_line <- ggplot(excess_death, aes(x = week_ending_date, y = percent_change)) +
+  geom_smooth(se = FALSE, method = "loess", span = 0.3, color = "black")
+
+variant_waves_IK <- tibble::tibble(
+  start = as_date(c("2020-03-01", "2021-01-01", "2021-07-01", "2021-12-01", "2022-04-01", "2023-06-15")),
+  end   = as_date(c("2021-02-28", "2021-06-30", "2021-10-30", "2022-03-31", "2023-06-14", "2024-03-31")),
+  variant = c("1st Wave: Original", 
+              "2nd Wave: Alpha", 
+              "3rd Wave: Delta", 
+              "4th Wave: Omicron BA.1", 
+              "5th Wave: Omicron Other",
+              "6th Wave: XBB")
+)
+
+# Adding rectangles for each wave
+ymin_val <- min(excess_death$percent_change, na.rm = TRUE)
+ymax_val <- max(excess_death$percent_change, na.rm = TRUE)
+for (i in 1:nrow(variant_waves_IK)) {
+  loess_line <- loess_line + annotate("rect",
+                    xmin = variant_waves_IK$start[i],
+                    xmax = variant_waves_IK$end[i],
+                    ymin = ymin_val,
+                    ymax = ymax_val,
+                    alpha = 0.2,
+                    fill = scales::hue_pal()(nrow(variant_waves_IK))[i]
+  )
+}
+
+loess_overlay <- loess_line + labs(
+  title = "Excess Mortality Trend by Week with Variant Waves",
+  x = "Week",
+  y = "% Excess Mortality"
+) + theme_minimal()
+
+
+
+### Smoothing Line With Animation
+
+
+loess_fit_IK <- loess(percent_change ~ as.numeric(week_ending_date), data = excess_death, span = 0.3)
+excess_death$loess_smooth <- predict(loess_fit_IK)
+
+#gg_animate <- ggplot(excess_death, aes(x = week_ending_date)) + geom_rect(data = variant_waves_IK, aes(xmin = start, xmax = end, ymin = -Inf, ymax = Inf, fill = variant), inherit.aes = FALSE, alpha = 0.2) + geom_line(aes(y = loess_smooth), color = "black", linewidth = 1) +
+# labs(title = "Excess Mortality Trend with Variant Waves", x = "Week", y = "% Excess Mortality", fill = "Variant Waves") + theme(axis.text.x = element_text(angle = 45, hjust = 1),plot.title = element_text(hjust = 0.5)) + transition_reveal(week_ending_date) + theme_minimal()
+
+#animate(gg_animate, width = 900, height = 600, fps = 20, duration = 10, renderer = gifski_renderer("loess_animation.gif"), loop = FALSE)
+
+
+### States most frequently/least frequently in top 5 for excess deaths
+
+
+mean_excess_yr <- excess_death %>% mutate( mmwr_year = epiyear(week_ending_date)) %>% group_by(mmwr_year, state) %>% summarize(mean_percent_change = 100*mean(excess_deaths)/mean(expected_deaths), .groups = "drop") 
+
+top_5_yr <- mean_excess_yr %>% group_by(mmwr_year) %>% slice_max(mean_percent_change, n = 5, with_ties = FALSE) %>% ungroup() %>% group_by(state) %>% summarize(years_in_top5 = n(), top_years = paste(sort(unique(mmwr_year)), collapse = ", "))
+
+top_5_yr <- top_5_yr %>% mutate(top_years_wrapped = gsub("^((?:[^,]+, ){2}[^,]+),\\s*", "\\1\n", top_years))
+
+top_bar5 <- top_5_yr  %>% slice_max(years_in_top5, n = 5, with_ties = FALSE) %>%  ggplot(aes(x = reorder(state, years_in_top5), y = years_in_top5))+geom_col(fill = "steelblue") +  geom_text(
+  aes(label = top_years_wrapped),
+  hjust = -0.1,
+  size = 3
+) + labs(title = "States Most Frequently in the Top 5 for % Excess Mortality (2020-2025)", x = "State", y = "Years in Top 5") + coord_flip() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  ylim(0, max(top_5_yr$years_in_top5) + 1) + theme_minimal() 
+
+lower_5_year <- mean_excess_yr %>% group_by(mmwr_year) %>% slice_min(mean_percent_change, n = 5, with_ties = FALSE) %>% ungroup() %>% group_by(state) %>% summarize(years_in_low5 = n(), bottom_years = paste(sort(unique(mmwr_year)), collapse = ", "))
+
+lower_5_year <- lower_5_year %>% mutate(bottom_years_wrapped = gsub("^((?:[^,]+, ){2}[^,]+),\\s*", "\\1\n", bottom_years))
+
+lower_bar5 <- lower_5_year %>% slice_max(years_in_low5, n = 5, with_ties = FALSE) %>% ggplot(aes(x = reorder(state, years_in_low5), y = years_in_low5)) + geom_col(fill = "steelblue") +  geom_text(
+  aes(label = bottom_years_wrapped),
+  hjust = -0.1,
+  size = 3
+) + labs(title = "States Most Frequently in the Bottom 5 for % Excess Mortality (2020-2025)", x = "State", y = "Years in Bottom 5") + coord_flip() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  ylim(0, max(lower_5_year$years_in_low5) + 1) + theme_minimal() 
+
+
+### Observed vs Expected Deaths and Linear Trend of Excess Deaths vs Covid-19 Deaths 
+
+# ggplot(excess_death, aes(x = expected_deaths, y= total_deaths)) + geom_point() + labs(x = "Expected Deaths", y = "Observed Deaths", title = "Observed vs Expected Deaths") + geom_abline(slope = 1, intercept = 0, color = "red") + theme_minimal()
+
+#how much did the covid deaths account for excess deaths 
+
+ggplot(excess_death, aes(x=covid_19_deaths, y = excess_deaths)) + geom_point() + geom_smooth(method = "lm", se = FALSE, color = "blue") + labs(title = "Relationship Between Reported COVID-19 Deaths and Excess Mortality", x = "Reported COVID-19 Deaths", y = "Excess Mortality (# of Deaths)") + theme_minimal()
+
+covid_excess_death <- summary(lm(excess_deaths ~ covid_19_deaths, data = excess_death))
+covid_excess_death
+
+
+
+### How many Excess Deaths can be Attributed to COVID-19?
+
+
+diff_death_IK <- excess_death %>% mutate(diff_death = excess_deaths - covid_19_deaths) %>% filter(excess_deaths >=0)
+linreg_diff <- diff_death_IK %>% ggplot(aes(x = covid_19_deaths, y = diff_death)) + geom_point() + geom_hline(yintercept = 0, color = "red") + labs(x = "Deaths by Covid-19", y = "Difference in Excess and Covid-19 Deaths") + theme_minimal()
+
+
+### Considering Impact on Excess Deaths by Respiratory Diseases that were not COVID-19
+
+excess_death <- excess_death %>%
+  mutate(year = case_when(year %in% c("2019/2020", "2019-2020") ~ 2020,
+                          year %in% c("2020/2021", "2020-2021") ~ 2021,
+                          year %in% c("2021/2022", "2021-2022") ~ 2022,
+                          TRUE ~ as.numeric(year)))
+
+vax_clean_IK <- vax_raw_IK %>% select(date, series_complete_daily, location, mmwr_week) %>% mutate(series_complete_daily = as.numeric(series_complete_daily), state = state.name[match(location, state.abb)], year = epiyear(date)) %>% group_by(year, mmwr_week, state) %>% summarize(date = max(as.Date(date)),
+                                                                                                                                                                                                                                                                                    series_complete_weekly = sum(series_complete_daily, na.rm = TRUE), .groups = "drop") %>% mutate(mmwr_week = as.integer(mmwr_week))
+
+vax_excess <- left_join(excess_death, vax_clean_IK, by = c("year", "mmwr_week", "state")) %>% mutate(pneumonia_deaths_alone = as.numeric(pneumonia_deaths) - as.numeric(pneumonia_and_covid_19_deaths), influenza_deaths = as.numeric(influenza_deaths)) %>% filter(year<2024)
+
+other_excess_death <- summary(lm(
+  excess_deaths ~ covid_19_deaths + pneumonia_deaths_alone + influenza_deaths +
+    series_complete_weekly +
+    I(pneumonia_deaths_alone * covid_19_deaths) + I(influenza_deaths * covid_19_deaths),
+  data = vax_excess
+))
+other_excess_death
+
+
+other_excess_death_tidy <- tidy(other_excess_death)
+
+relabelled_table <- other_excess_death_tidy %>%
+  select(term, estimate, p.value) %>%
+  mutate(
+    term = recode(term,
+                  `(Intercept)` = "Intercept",
+                  `covid_19_deaths` = "Deaths by Covid-19",
+                  `pneumonia_deaths_alone` = "Deaths by Pneumonia Only",
+                  `influenza_deaths` = "Influenza Deaths",
+                  `series_complete_weekly` = "Vaccination Series Complete",
+                  `pneumonia_deaths_alone*covid_19_deaths` = "Deaths by Pneumonia Only * Deaths by Covid-19",
+                  `I(influenza_deaths*covid_19_deaths)` = "Influenza Deaths * Deaths by Covid-19"
+    )
+  ) %>%
+  kable(
+    caption = "Regression Results: Predicting Excess Deaths",
+    col.names = c("Term", "Estimate", "P-Value"),
+    format = "html"
+  )
+relabelled_table
+
+
+
+resp_precovid <- read.csv("data/NCHSData15.csv") %>%
+  rename(
+    year = Year,
+    mmwr_week = Week,
+    pneumonia_deaths = Pneumonia.Deaths,
+    influenza_deaths = Influenza.Deaths
+  ) %>%
+  filter(year < 2020)
+future_weeks <- resp_precovid %>% 
+  group_by(mmwr_week) %>%
+  summarize(expected_resp_deaths = mean(pneumonia_deaths, na.rm = TRUE)) %>%
+  ungroup() %>%  crossing(year = 2020:2025)
+
+ggplot(resp_precovid, aes(x = mmwr_week, y = pneumonia_deaths, color = factor(year))) +
+  geom_point() +
+  theme_minimal() +
+  labs(x = "Week", y = "Pneumonia Deaths", color = "Year")  # Renamed to pneumonia deaths
+
+
+ggplot() +
+  geom_point(data = resp_precovid, aes(x = mmwr_week, y = pneumonia_deaths, color = as.factor(year)), alpha = 0.5, shape = 1) +
+  geom_point(data = future_weeks %>%
+               mutate(year = "2020-2025"), aes(x = mmwr_week, y = expected_resp_deaths, color = factor(year))) +
+  theme_minimal() +
+  labs(
+    title = "Expected Pneumonia Deaths (2020–2025) with Historical Baseline",
+    x = "Week",
+    y = "Expected Pneumonia Deaths",  # Updated to reflect pneumonia deaths
+    color = "Year"
+  )
+
+
+
+
+### Excess Respiratory Deaths + Covid = Excess Death?
+resp_analysis <- excess_death %>%
+  mutate(
+    pneumonia_alone = as.numeric(pneumonia_deaths) - as.numeric(pneumonia_and_covid_19_deaths),
+    resp_deaths = pneumonia_alone
+  ) %>%
+  group_by(mmwr_week, year) %>%
+  summarize(
+    pneumonia_deaths = sum(resp_deaths, na.rm = TRUE),
+    covid_19_deaths = sum(covid_19_deaths, na.rm = TRUE),
+    excess_deaths_total = sum(excess_deaths, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  left_join(future_weeks, by = c("year", "mmwr_week")) %>%
+  mutate(diff_resp = pneumonia_deaths - expected_resp_deaths,
+         excess_resp_only = ifelse(diff_resp > 0, diff_resp, 0),
+         covid_plus_resp = covid_19_deaths + excess_resp_only,
+         residual_covid_only = excess_deaths_total - covid_19_deaths,
+         residual_covid_plus_resp = excess_deaths_total - covid_plus_resp,
+         residual_difference = 100*(residual_covid_only - residual_covid_plus_resp)/residual_covid_only
+  )
+
+excess_notcovid <- ggplot(resp_analysis, aes(x = covid_19_deaths, y = residual_covid_plus_resp)) +
+  geom_point() +
+  labs(x = "Covid-19 Deaths", y = "Excess Pneumonia Mortality") +
+  theme_minimal() +
+  geom_hline(yintercept = 0, color = "red")
+
+excess_pneum <- ggplot(resp_analysis, aes(x = MMWRweek2Date(MMWRyear = year, MMWRweek = mmwr_week))) +
+  geom_line(aes(y = residual_covid_only, color = "COVID only"), linewidth = 1) +
+  geom_line(aes(y = residual_covid_plus_resp, color = "COVID + Pneumonia"), linewidth = 1.3, linetype = "dashed") +
+  geom_hline(yintercept = 0, linetype = "dotted") +
+  labs(
+    y = "Unexplained Excess Deaths",
+    x = "Week",
+    color = "Model",
+    title = "Explained vs Unexplained Excess Deaths: Adding Pneumonia"
+  ) +
+  theme_minimal()
+
+exp_v_unexp <- ggplot(resp_analysis, aes(x = MMWRweek2Date(MMWRyear = year, MMWRweek = mmwr_week))) +
+  geom_line(aes(y = residual_difference), color = "red", size = 1.2) +
+  geom_hline(yintercept = 0, linetype = "dotted", color = "black") +
+  labs(
+    title = "Impact of Including Pneumonia Deaths on Excess Mortality Estimates",
+    x = "Week",
+    y = " % Unexplained Excess Deaths Accounted For"
+  ) +
+  theme_minimal()
+
+
+
 

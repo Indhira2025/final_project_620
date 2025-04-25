@@ -1,0 +1,5 @@
+"0","# ggplot(excess_death, aes(x = expected_deaths, y= total_deaths)) + geom_point() + labs(x = ""Expected Deaths"", y = ""Observed Deaths"", title = ""Observed vs Expected Deaths"") + geom_abline(slope = 1, intercept = 0, color = ""red"") + theme_minimal()"
+"0",""
+"0","#how much did the covid deaths account for excess deaths "
+"0",""
+"0","ggplot(excess_death, aes(x=covid_19_deaths, y = excess_deaths)) + geom_point() + geom_smooth(method = ""lm"", se = FALSE, color = ""blue"") + labs(title = ""Relationship Between Reported COVID-19 Deaths and Excess Mortality"", x = ""Reported COVID-19 Deaths"", y = ""Excess Mortality (# of Deaths)"") + theme_minimal()"

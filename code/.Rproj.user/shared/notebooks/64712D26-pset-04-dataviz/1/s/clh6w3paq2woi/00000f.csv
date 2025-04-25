@@ -1,0 +1,13 @@
+"0","library(knitr)"
+"0","### Uncomment this to run this"
+"0","kable(head(cases_raw))"
+"2","Registered S3 methods overwritten by 'htmltools':
+  method               from         
+  print.html           tools:rstudio
+  print.shiny.tag      tools:rstudio
+  print.shiny.tag.list tools:rstudio
+"
+"2","Registered S3 method overwritten by 'rmarkdown':
+  method         from
+  print.paged_df     
+"

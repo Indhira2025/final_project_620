@@ -1,0 +1,2 @@
+"0","#colnames(deaths_raw)"
+"0","kable(head(vax_raw))"

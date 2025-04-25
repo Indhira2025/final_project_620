@@ -1,0 +1,4 @@
+"0","excess_death <- covid_deaths_IK %>% mutate(mmwr_week = as.integer(mmwr_week), total_deaths = as.numeric(total_deaths), covid_19_deaths = as.numeric(covid_19_deaths), percent_of_expected_deaths = as.numeric(percent_of_expected_deaths)) %>% "
+"0","  mutate(expected_deaths = total_deaths/(percent_of_expected_deaths/100), excess_deaths = total_deaths - expected_deaths, percent_change = (excess_deaths/expected_deaths)*100) %>% filter(!is.na(expected_deaths))"
+"0",""
+"0","excess_death"

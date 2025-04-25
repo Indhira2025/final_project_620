@@ -1,0 +1,4 @@
+"0","ggplot(vax_july1, aes(x = region_name, y = vax_rate, fill = region)) +"
+"0","  geom_boxplot() +"
+"0","  labs(title = ""Vaccination Rates by Region on July 1, 2021"", x = ""Region"", y = ""Vaccination Rate"") +"
+"0","  theme(legend.position = ""none"") "

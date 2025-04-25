@@ -1,0 +1,7 @@
+"0",""
+"0","covid_deaths_IK <- deaths_raw_IK %>%"
+"0","  mutate(week_ending_date = as.Date(week_ending_date),"
+"0","         start_date = as.Date(start_date),"
+"0","         end_date = as.Date(end_date)) %>%"
+"0","  filter(group == ""By Week"", !is.na(total_deaths), !state %in% c(""United States"", ""Puerto Rico"", ""District of Columbia"", ""New York City""),!is.na(covid_19_deaths)) %>% select(-c(group, month, data_as_of, footnote))"
+"0",""

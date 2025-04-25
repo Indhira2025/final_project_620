@@ -1,0 +1,4 @@
+"0","pre_covid_raw <- get_cdc_data(pre_covid_url)
+"
+"2","Error: object 'pre_covid_url' not found
+"

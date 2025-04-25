@@ -2,12 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Author Name">
+<meta name="dcterms.date" content="2025-04-24">
 
-<title>From Outbrek to Endemic: Covid-19 in the US</title>
+<title>Impact of COVID-19 on Mortality in the United States: A Temporal and Regional Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -63,11 +65,40 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="final_project_620_paper_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="final_project_620_paper_files/libs/quarto-html/anchor.min.js"></script>
 <link href="final_project_620_paper_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="final_project_620_paper_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="final_project_620_paper_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="final_project_620_paper_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="final_project_620_paper_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="final_project_620_paper_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="final_project_620_paper_files/libs/bootstrap/bootstrap-8a79a254b8e706d3c925cde0a310d4f0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -79,14 +110,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">From Outbrek to Endemic: Covid-19 in the US</h1>
+<h1 class="title">Impact of COVID-19 on Mortality in the United States: A Temporal and Regional Analysis</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Author Name </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">2025-04-24</p>
+    </div>
+  </div>
   
     
   </div>
@@ -100,6 +143,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1></h1>
 <p>Indhira Vadivel, Isha Khapre, Medha Rao</p>
 </section>
+<section id="abstract" class="level1">
+<h1>Abstract</h1>
+</section>
+<section id="abstract-1" class="level1">
+<h1>Abstract</h1>
+<p>The COVID-19 pandemic has had a dynamic and multifaceted impact on mortality in the United States, evolving through successive waves marked by distinct viral variants. These shifts were accompanied by changes in clinical severity, population immunity, and public health strategies. Understanding the temporal, regional, and epidemiological trends in both confirmed COVID-19 deaths and excess mortality is essential for evaluating the broader consequences of the pandemic and informing future health interventions.</p>
+<section id="background" class="level4">
+<h4 class="anchored" data-anchor-id="background">Background</h4>
+<p>The COVID-19 pandemic has had a dynamic and multifaceted impact on mortality in the United States, evolving through successive waves marked by distinct viral variants. These shifts were accompanied by changes in clinical severity, population immunity, and public health strategies. Understanding the temporal, regional, and epidemiological trends in both confirmed COVID-19 deaths and excess mortality is essential for evaluating the broader consequences of the pandemic and informing future health interventions.</p>
+</section>
+<section id="methods" class="level3">
+<h3 class="anchored" data-anchor-id="methods">Methods</h3>
+<p>We analyzed weekly state-level mortality data from the CDC and NCHS from January 2020 to April 2025. COVID-19 variant waves were defined based on CDC reports and overlaid with death trends, hospitalization rates, and vaccination coverage. We calculated rolling averages, case fatality rates, hospitalizations per 1,000 cases, and excess deaths by comparing observed mortality to pre-pandemic baselines. Statistical comparisons and regression models assessed the influence of COVID-19, pneumonia, influenza, and vaccination rates on excess mortality.</p>
+</section>
+<section id="results" class="level3">
+<h3 class="anchored" data-anchor-id="results">Results</h3>
+<p>Mortality peaked during the Original and Delta waves, followed by a decline in the Omicron period. CFRs and virulence metrics decreased consistently across waves. Geographic disparities persisted, with Southern and Western states reporting higher per capita death rates. Excess deaths often exceeded reported COVID-19 deaths, particularly in early 2020. Pneumonia and influenza were significant contributors to excess mortality. Vaccination coverage increased over time and was negatively associated with excess deaths.</p>
+</section>
+<section id="discussion" class="level3">
+<h3 class="anchored" data-anchor-id="discussion">Discussion</h3>
+<p>Our findings highlight the pandemic’s evolving severity, the protective role of vaccination, and ongoing regional disparities. Misclassification and indirect effects contributed to underreported COVID-19 mortality. These results emphasize the importance of robust surveillance, equitable healthcare access, and variant-specific public health strategies moving forward.</p>
+</section>
+</section>
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
 <p>The COVID-19 pandemic represents one of the most consequential public health crises of the 21st century. Since the first confirmed U.S. cases in early 2020, the nation has faced an evolving series of challenges in containing the virus, managing its health effects, and grappling with its far-reaching societal disruptions. The initial phase of the pandemic was marked by limited testing, widespread uncertainty, and rapidly rising transmission rates, quickly escalating the crisis to a national emergency. Over time, the landscape of the pandemic shifted as vaccines were developed and deployed, public health strategies adapted, and the virus evolved into new variants. By early 2025, COVID-19 had transitioned from an acute pandemic into a more endemic condition—still impactful, but with changing dynamics.</p>
@@ -110,7 +176,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Finally, we consider the possibility of misclassified deaths, especially during the early stages of the pandemic when testing capacity was limited. By analyzing trends in pneumonia-related mortality, which may overlap clinically with COVID-19, we explore whether some early fatalities were undercounted or misattributed.&nbsp;</p>
 <p>Through this multifaceted approach, our study provides a data-driven account of the COVID-19 pandemic’s evolving impact in the United States. By integrating time trends, geographic disparities, and clinical indicators, we aim to contribute to a deeper understanding of the crisis and inform strategies for managing future infectious disease threats.</p>
 </section>
-<section id="methods" class="level1">
+<section id="methods-1" class="level1">
 <h1>Methods</h1>
 <p>To analyze COVID-19 mortality trends and excess deaths in the United States from 2020 to 2025, we obtained publicly available data from the <strong>Centers for Disease Control and Prevention (CDC)</strong>. Specifically, we accessed datasets containing information on confirmed COVID-19 cases, hospitalizations, deaths, and vaccination coverage through the CDC’s open data portal (<a href="https://data.cdc.gov/" class="uri">https://data.cdc.gov/</a>), using API endpoints and automated querying. The datasets used included:</p>
 <ul>
@@ -118,6 +184,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p><strong>COVID-19 Hospitalizations</strong></p></li>
 <li><p><strong>COVID-19 Deaths</strong></p></li>
 <li><p><strong>COVID-19 Vaccinations</strong>&nbsp;</p></li>
+<li><p><strong>Historical Pneumonia Deaths (2013-2019)</strong></p></li>
 </ul>
 <p>To streamline data access and ensure reproducibility, we built a custom function in R using the httr2 package, which allowed for efficient API calls and retrieval of large datasets (up to 10 million records per query).</p>
 <section id="visualization-and-analysis-of-covid-19-deaths" class="level3">
@@ -139,27 +206,110 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Identification of Top States by Annual COVID-19 Death Rate<br>
 </strong>To highlight states most impacted annually, we computed yearly death rates per 100,000 population for each state (2020–2024). The top state per year (based on death rate) was identified and displayed in a summary table. A corresponding bar plot illustrated these top states over time, aiding in the visualization of annual mortality burdens and shifts in geographic impact.</p>
 </section>
+<section id="excess-deaths-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="excess-deaths-analysis">Excess Deaths Analysis</h2>
+<p>We analyzed excess mortality during COVID-19 using CDC data on weekly deaths, vaccinations, and NCHS records on pneumonia and influenza from 2013–2020. Our goals included assessing respiratory illness and vaccination impacts, examining temporal and regional mortality trends, and evaluating COVID-19’s role in unexplained deaths.</p>
+<section id="data-pre-processing" class="level3">
+<h3 class="anchored" data-anchor-id="data-pre-processing">Data Pre-Processing</h3>
+<p>Dates were standardized (<code>yyyy-mm-dd</code>), and data was filtered to include only weekly records for the 50 U.S. states. We removed rows with missing death data and dropped irrelevant columns (<code>data_as_of</code>, <code>footnote</code>, <code>group</code>, <code>month</code>).</p>
 </section>
-<section id="results" class="level1">
+<section id="excess-deaths-calculation" class="level3">
+<h3 class="anchored" data-anchor-id="excess-deaths-calculation">Excess Deaths Calculation</h3>
+<p>We calculated expected deaths as:</p>
+<p><span class="math display">\[
+\text{Expected Deaths} = \text{Total Deaths} \times \left( \frac{100}{\%\ \text{Expected Deaths}} \right)
+\]</span></p>
+<p>Rows with missing expected death data were excluded.</p>
+<p>Excess deaths were calculated as: <span class="math display">\[
+\text{Excess Deaths} = \text{Total Deaths} - \text{Expected Deaths}
+\]</span></p>
+<p>Standardized Excess Deaths were calculated as: <span class="math display">\[
+\%\ \text{Change} = \left( \frac{\text{Excess Deaths}}{\text{Expected Deaths}} \right) \times 100
+\]</span> Excess deaths were changed to % Change in Expected Deaths (% Excess Mortality), so that they could be compared relatively.</p>
+</section>
+<section id="temporal-regional-trends" class="level3">
+<h3 class="anchored" data-anchor-id="temporal-regional-trends">Temporal &amp; Regional Trends</h3>
+<p>Using <code>ggplot2</code>, we visualized weekly % excess deaths by region (Northeast, South, North Central, West) from Mar 2020–Apr 2025. Trends were smoothed using <code>loess</code> and animated with <code>gganimate</code>. COVID variant waves (Alpha, Delta, Omicron) were overlaid.</p>
+</section>
+<section id="topbottom-5-states-by-excess-mortality" class="level3">
+<h3 class="anchored" data-anchor-id="topbottom-5-states-by-excess-mortality">Top/Bottom 5 States by Excess Mortality</h3>
+<p>We identified states most frequently in the top and bottom 5 for % excess mortality by year (using <code>epiyear</code>) on the week_ending_date column. The average percent change in expected mortality was calculated for each year with the formula: <span class="math display">\[
+\%\ \text{Change in Expected Deaths} = \left( \frac{\text{Average Excess Deaths}}{\text{Average Expected Deaths}} \right) \times 100
+\]</span></p>
+<p>Results were shown via horizontal bar charts with year annotations.</p>
+</section>
+<section id="covid-19-excess-deaths" class="level3">
+<h3 class="anchored" data-anchor-id="covid-19-excess-deaths">COVID-19 &amp; Excess Deaths</h3>
+<p>A regression model (<code>lm()</code>) evaluated the relationship between COVID-19 deaths and excess deaths:</p>
+<p><span class="math display">\[
+\text{Excess Deaths}_i = \beta_0 + \beta_1 \cdot \text{COVID-19 Deaths}_i
+\]</span></p>
+<p>Non-COVID excess deaths were calculated and plotted where excess deaths &gt; 0.</p>
+</section>
+<section id="data-harmonization-merging" class="level3">
+<h3 class="anchored" data-anchor-id="data-harmonization-merging">Data Harmonization &amp; Merging</h3>
+<p>Vaccination data was aggregated weekly by state. Dates, week numbers, and year labels were cleaned. State abbreviations were expanded. The data was merged with the death dataset by year, week, and state.</p>
+<p>Deaths from pneumonia alone were computed: <span class="math display">\[
+\text{Pneumonia-Only Deaths} = \text{Pneumonia Deaths} - (\text{Pneumonia + COVID-19 Deaths})
+\]</span></p>
+</section>
+<section id="multivariate-modeling" class="level3">
+<h3 class="anchored" data-anchor-id="multivariate-modeling">Multivariate Modeling</h3>
+<p>We fit a linear model to predict excess mortality:</p>
+<p><span class="math display">\[
+\text{Excess Deaths}_i = \beta_0 + \beta_1 \cdot \text{COVID}_i + \beta_2 \cdot \text{Pneumonia}_i + \beta_3 \cdot \text{Influenza}_i + \beta_4 \cdot \text{Vaccinations}_i + \beta_5 \cdot (\text{Pneumonia}_i \times \text{COVID}_i) + \beta_6 \cdot (\text{Influenza}_i \times \text{COVID}_i)
+\]</span></p>
+<p>Since vaccination data was only upto May 2023, we only fit the MLR on 2020-2023 data.</p>
+<p>Model outputs were formatted with <code>broom::tidy()</code>.</p>
+</section>
+<section id="hidden-covid-19-burden-in-pneumonia" class="level3">
+<h3 class="anchored" data-anchor-id="hidden-covid-19-burden-in-pneumonia">Hidden COVID-19 Burden in Pneumonia</h3>
+<p>We used NCHS data (2013–2019) to estimate expected pneumonia deaths for 2020–2025. Weekly comparisons were plotted alongside historical averages.</p>
+<p>Residuals were calculated:</p>
+<ul>
+<li><strong>COVID-only residual</strong>: unexplained excess deaths after accounting for COVID-19 deaths.</li>
+<li><strong>COVID + Pneumonia residual</strong>: residual after also accounting for pneumonia deaths.</li>
+<li><strong>% Improvement</strong> = <span class="math display">\[
+\left( \frac{\text{COVID-only residual} - \text{COVID + Pneumonia residual}}{\text{COVID-only residual}} \right) \times 100\]</span></li>
+</ul>
+<p>These residuals were visualized over time to assess pneumonia’s explanatory power in COVID-era excess mortality.</p>
+</section>
+</section>
+</section>
+<section id="results-1" class="level1">
 <h1>Results</h1>
+<section id="figure-1" class="level3">
+<h3 class="anchored" data-anchor-id="figure-1">Figure 1</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#getwd()</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"./code/finalprojectcode.R"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'httr2' was built under R version 4.4.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'lubridate' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'janitor' was built under R version 4.4.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'tidyverse' was built under R version 4.4.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'zoo' was built under R version 4.4.2</code></pre>
+</div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 ℹ Please use `linewidth` instead.</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Warning in grid.Call.graphics(C_text, as.graphicsAnnot(x$label), x$x, x$y, :
-for 'US Weekly COVID-19 Deaths with Variant Waves (2020–2025)' in 'mbcsToSbcs':
-- substituted for – (U+2013)</code></pre>
+<pre><code>Warning: package 'jsonlite' was built under R version 4.4.3</code></pre>
 </div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="final_project_620_paper_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'patchwork' was built under R version 4.4.2</code></pre>
 </div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'MMWRweek' was built under R version 4.4.3</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`summarise()` has grouped output by 'state', 'mmwr_week'. You can override
@@ -199,6 +349,9 @@ The following objects are masked from 'package:lubridate':
 The following objects are masked from 'package:dplyr':
 
     between, first, last</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'rcompanion' was built under R version 4.4.3</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 2
@@ -247,7 +400,17 @@ The following objects are masked from 'package:dplyr':
 5 5th Wave: Omicron… 6th Wave…           196.           NA       NA       NA    
 # ℹ 1 more variable: Upper_CI &lt;dbl&gt;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(topstate_by_wave_v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'gganimate' was built under R version 4.4.3</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There was 1 warning in `mutate()`.
+ℹ In argument: `year = case_when(...)`.
+Caused by warning:
+! NAs introduced by coercion</code></pre>
+</div>
+</div>
+<div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 5
   state_name    wave             total_deaths avg_population death_rate_per_100k
@@ -259,7 +422,6 @@ The following objects are masked from 'package:dplyr':
 5 Kentucky      6th Wave:Omicro…         6060       4577532.               132. 
 6 Michigan      2nd Wave: Alpha          7916      10050811                 78.8</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(top_state_per_year_v)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 
@@ -273,7 +435,6 @@ Table: Table 2: Summary - States with highest death rate (by year)
 | 2023|Kentucky      |         5597|    4550595|           122.99491|
 | 2024|Kentucky      |         3406|    4588372|            74.23112|</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hosp_plot_msr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
 (`geom_col()`).</code></pre>
@@ -281,11 +442,10 @@ Table: Table 2: Summary - States with highest death rate (by year)
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="final_project_620_paper_files/figure-html/unnamed-chunk-1-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="final_project_620_paper_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(cfr_plot_msr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
 (`geom_col()`).</code></pre>
@@ -293,11 +453,10 @@ Table: Table 2: Summary - States with highest death rate (by year)
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="final_project_620_paper_files/figure-html/unnamed-chunk-1-3.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="final_project_620_paper_files/figure-html/unnamed-chunk-2-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(vax_plot_msr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 1 row containing missing values or values outside the scale range
 (`geom_col()`).</code></pre>
@@ -305,7 +464,7 @@ Table: Table 2: Summary - States with highest death rate (by year)
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="final_project_620_paper_files/figure-html/unnamed-chunk-1-4.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="final_project_620_paper_files/figure-html/unnamed-chunk-2-3.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -315,16 +474,115 @@ Table: Table 2: Summary - States with highest death rate (by year)
 <p>Figure 1(bottom-left) shows the trend in COVID-19 death rates (per 100,000 people) by U.S. region across the six variant waves. The Southeast region exhibited the highest death rate during the 1st Wave, exceeding 3,900 deaths per 100,000. Although all regions experienced a general decline in death rates across waves, the South Central and Mountain States consistently reported higher mortality compared to other regions, such as New England or the Pacific Northwest. This trend suggests regional disparities in pandemic impact that persisted even as the virus evolved and vaccines became widely available.</p>
 <p>Figure 1(bottom-right) focuses on the top five states with the highest death rates per 100,000 for each wave. The affected states varied across waves, with Mississippi, Alabama, and Oklahoma appearing frequently in the top ranks. The 2nd Wave (Alpha) was notable for a shift toward northeastern states, including New Jersey and Pennsylvania. During the Delta and Omicron waves, Southern and Appalachian states, including Kentucky, West Virginia, and Tennessee, were disproportionately represented. Puerto Rico also emerged during the 5th Wave, illustrating how regional vulnerabilities extended beyond the continental U.S.</p>
 </section>
-<section id="discussion" class="level1">
+<section id="figure-x" class="level3">
+<h3 class="anchored" data-anchor-id="figure-x">Figure X</h3>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>`geom_smooth()` using formula = 'y ~ x'
+`geom_smooth()` using formula = 'y ~ x'</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_620_paper_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Figure X presents visualizations (A–D with A being the left top, B being the right top, C being the bottom left, and D being the bottom right) of excess mortality trends across U.S. regions during the COVID-19 pandemic. Panel A shows a similar trend in excess mortality across regions, with the Northeast experiencing a sharp early spike in 2020, followed by lower excess deaths compared to other regions. The West had slightly higher excess deaths on average. Loess smoothing revealed national peaks in December 2020 and 2021, aligning with major COVID-19 surges. Panel B highlights these spikes, particularly during the early 2020 and Delta waves. Panels C and D show states most frequently in the top and bottom five for excess mortality. Arizona and New Mexico were often in the top five, while New Jersey appeared in the bottom five four out of six years, indicating lower excess mortality.</p>
+</section>
+<section id="table-1" class="level3">
+<h3 class="anchored" data-anchor-id="table-1">Table 1</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>relabelled_table </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small" data-quarto-postprocess="true">
+<caption>Regression Results: Predicting Excess Deaths</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Term</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Estimate</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">P-Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Intercept</td>
+<td style="text-align: right;">24.4074801</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Deaths by Covid-19</td>
+<td style="text-align: right;">0.8682392</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Deaths by Pneumonia Only</td>
+<td style="text-align: right;">0.9635193</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Influenza Deaths</td>
+<td style="text-align: right;">2.0824037</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Vaccination Series Complete</td>
+<td style="text-align: right;">-0.0001267</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">I(pneumonia_deaths_alone * covid_19_deaths)</td>
+<td style="text-align: right;">0.0011283</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">I(influenza_deaths * covid_19_deaths)</td>
+<td style="text-align: right;">-0.0035714</td>
+<td style="text-align: right;">0.0404551</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p>The multiple linear regression model showed a strong fit, with an Adjusted R² of 0.8239 and a p-value of p &lt; 2.2 × 10⁻¹⁶, indicating that over 82% of the variance in excess deaths was explained by the predictors. COVID-19 deaths were a significant positive predictor (β = 0.868, p &lt; 2 × 10⁻¹⁶), underscoring the pandemic’s central role in excess mortality. Pneumonia deaths also significantly contributed (β = 0.964, p &lt; 2 × 10⁻¹⁶), with a significant positive interaction term between pneumonia and COVID-19 deaths (β = 0.00113, p &lt; 2 × 10⁻¹⁶). Influenza deaths were a positive predictor (β = 2.082, p = 3.84 × 10⁻⁸), though the interaction with COVID-19 deaths was negative and marginally significant (β = –0.00357, p = 0.0405), suggesting potential redundancy or overcounting in death certifications. Vaccination rates were negatively associated with excess mortality (β = –1.27 × 10⁻⁴, p &lt; 2 × 10⁻¹⁶), indicating a protective effect. These results highlight the significant roles of COVID-19, pneumonia, and influenza in excess mortality, with vaccinations helping to reduce deaths, and suggest potential misclassification of some COVID-19 deaths as pneumonia.</p>
+</section>
+<section id="figure-y" class="level3">
+<h3 class="anchored" data-anchor-id="figure-y">Figure Y</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  linreg_diff, excess_notcovid, </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  exp_v_unexp, excess_pneum, </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">layout_matrix =</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>))</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_620_paper_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Figure Y explores the relationship between COVID-19 deaths, excess mortality, and pneumonia-related mortality across the pandemic timeline (A–D with A being the left top, B being the right top, C being the bottom left, and D being the bottom right). Panel A demonstrates a clear positive association between weekly COVID-19 deaths and excess mortality. This suggests that increases in reported COVID-19 deaths were strongly aligned with increases in total excess deaths, supporting COVID-19 as a prominent driver of excess mortality during the pandemic. Panel B reveals that, on average, a substantial proportion of excess deaths were not directly attributed to COVID-19 deaths alone. This gap indicates that official COVID-19 death counts may underrepresent the true mortality burden of the pandemic, due to indirect effects or potential misclassification of cause of death. Panel C shows the number of positive excess pneumonia deaths compared to historical expectations across 2020-2025. Instances where pneumonia mortality exceeded expected levels were treated as possible indicators of misclassification of covid-19 as pneumonia or death by pneumonia as a secondary effect of covid-19. These discrepancies were most apparent in early 2020, prior to widespread testing, and at the end of 2022. Panel D further evaluates the impact of pneumonia-related mortality on overall excess deaths as a potential source of COVID-19 misclassification and residual excess deaths. While pneumonia deaths appeared elevated at certain points, they did not account for the majority of unexplained excess mortality.</p>
+</section>
+</section>
+<section id="discussion-1" class="level1">
 <h1>Discussion</h1>
-<p>This study presents a comprehensive analysis of COVID-19 mortality in the United States from 2020 through early 2025, revealing key temporal, geographic, and variant-specific patterns, as well as shifts in disease severity and excess mortality over time. Our findings show that the overall burden of COVID-19 deaths peaked during the early stages of the pandemic and again during the Delta wave, with mortality declining substantially during the later Omicron waves. This trajectory suggests the influence of evolving viral characteristics, population-level immunity, public health interventions, and improvements in clinical management.</p>
-<p>Geographically, we observed persistent disparities in mortality throughout the pandemic. Southern and Appalachian states, along with parts of the Midwest, consistently experienced higher death rates compared to other regions. These states frequently appeared among the top five in per capita COVID-19 mortality during multiple variant waves. Factors likely contributing to these disparities include lower vaccination coverage, higher prevalence of chronic diseases, and reduced access to healthcare resources. Conversely, northeastern states, which were heavily affected in the initial wave, appeared less frequently in later waves, possibly due to early surges driving more robust public health responses or higher subsequent immunity. These trends highlight the ongoing importance of addressing structural health inequities in regional pandemic preparedness.</p>
-<p>Temporal analysis across variant waves revealed a non-linear trend in hospitalization and mortality metrics. Although hospitalizations per 1,000 cases decreased between the Original and Delta waves, they resurged during later Omicron subvariant periods, particularly BA.2 to XBB. This bimodal trend may reflect a dynamic virulence-immunity tradeoff, where the virus evolved to maintain high transmissibility despite partial immune protection in the population. In contrast, case fatality rates (CFRs) declined steadily across waves. This monotonic decline, confirmed through chi-squared comparisons and mortality rate ratios, points toward a genuine reduction in disease severity over time. Likely contributing factors include mass vaccination, earlier detection and treatment, as well as accumulated population immunity through prior infection.</p>
-<p>Still, these patterns must be interpreted within a broader public health context. Vaccination coverage increased steadily across waves and was strongly associated with lower excess mortality. However, improvements in clinical management (e.g., increased use of dexamethasone and remdesivir post-2021), greater availability of home testing during Omicron surges, and high rates of prior infection (with estimates suggesting over 58% of Americans had been infected by 2023) also likely contributed to the observed reductions in severity. These interacting factors complicate efforts to attribute mortality reductions to any single cause and underscore the need for multifaceted public health strategies.</p>
-<p>Our analysis of excess mortality adds further depth to these findings. The Delta wave and the early pandemic phase were associated with the highest percentages of excess deaths, consistent with their documented impact on hospital systems and public health infrastructure. Western states, including Arizona and New Mexico, reported some of the highest levels of excess mortality across multiple waves, while northeastern states like New Jersey more frequently appeared among those with lower relative burden. One possible explanation for this pattern is the greater healthcare capacity and urban infrastructure in the Northeast, which may have mitigated severe outcomes.</p>
-<p>Regression analysis also revealed important interactions among causes of death. COVID-19 deaths were the strongest predictor of excess mortality, but pneumonia-related deaths showed a significant interaction, suggesting that pneumonia often served as a secondary complication rather than a source of misclassification. Influenza, while statistically significant, had a negative interaction with COVID-19 mortality. This may reflect reduced influenza transmission due to social distancing or potential over-attribution of deaths to influenza during overlapping respiratory illness seasons.</p>
-<p>Several limitations should be acknowledged. First, mortality reporting lags—ranging from 2 to 8 weeks—introduce uncertainty in the temporal alignment of peaks and variant-specific waves. Additionally, the dataset did not distinguish between influenza-only deaths and those involving co-infections, possibly inflating influenza’s apparent impact. Moreover, home testing and shifts in death attribution practices may have affected both case and death reporting over time, particularly during the Omicron period.</p>
-<p>Despite these limitations, the findings provide critical insights into how the evolving virology of SARS-CoV-2, combined with public health responses and sociodemographic context, shaped the trajectory of the pandemic in the United States. Importantly, the regional and temporal heterogeneity in mortality reinforces the need for locally tailored strategies, ongoing surveillance, and adaptive public health responses. As new variants emerge, continued investment in vaccine development, equitable healthcare access, and data transparency will be crucial to managing future public health crises.</p>
+<p>This study presents a comprehensive analysis of COVID-19 mortality in the United States from 2020 through early 2025, revealing key temporal, geographic, and variant-specific patterns, as well as shifts in disease severity and excess mortality over time. Our findings show that the overall burden of COVID-19 deaths peaked during the early stages of the pandemic and again during the Delta wave, with mortality declining substantially during the later Omicron waves. This trajectory suggests the influence of evolving viral characteristics, population-level immunity, public health interventions, and improvements in clinical management. Geographically, we observed persistent disparities in mortality throughout the pandemic. Southern and Appalachian states, along with parts of the Midwest, consistently experienced higher death rates compared to other regions. These states frequently appeared among the top five in per capita COVID-19 mortality during multiple variant waves. Factors likely contributing to these disparities include lower vaccination coverage, higher prevalence of chronic diseases, and reduced access to healthcare resources. Conversely, northeastern states, which were heavily affected in the initial wave, appeared less frequently in later waves, possibly due to early surges driving more robust public health responses or higher subsequent immunity. These trends highlight the ongoing importance of addressing structural health inequities in regional pandemic preparedness. Temporal analysis across variant waves revealed a non-linear trend in hospitalization and mortality metrics. Although hospitalizations per 1,000 cases decreased between the Original and Delta waves, they resurged during later Omicron subvariant periods, particularly BA.2 to XBB. This bimodal trend may reflect a dynamic virulence-immunity tradeoff, where the virus evolved to maintain high transmissibility despite partial immune protection in the population. In contrast, case fatality rates (CFRs) declined steadily across waves. This monotonic decline, confirmed through chi-squared comparisons and mortality rate ratios, points toward a genuine reduction in disease severity over time. Likely contributing factors include mass vaccination, earlier detection and treatment, as well as accumulated population immunity through prior infection. Still, these patterns must be interpreted within a broader public health context. Vaccination coverage increased steadily across waves and was strongly associated with lower excess mortality. However, improvements in clinical management (e.g., increased use of dexamethasone and remdesivir post-2021), greater availability of home testing during Omicron surges, and high rates of prior infection (with estimates suggesting over 58% of Americans had been infected by 2023) also likely contributed to the observed reductions in severity. These interacting factors complicate efforts to attribute mortality reductions to any single cause and underscore the need for multifaceted public health strategies. Our analysis of excess mortality adds further depth to these findings. The Delta wave and the early pandemic phase were associated with the highest percentages of excess deaths, consistent with their documented impact on hospital systems and public health infrastructure (Tabatabai M et al.&nbsp;2023). Western states, including Arizona and New Mexico, reported some of the highest levels of excess mortality across multiple waves, while northeastern states like New Jersey more frequently appeared among those with lower relative burden. One possible explanation for this pattern is the greater healthcare capacity in urban versus rural areas of the Northeast, which may have mitigated severe outcomes (Crankshaw, K 2023). Regression analysis also revealed important interactions among causes of death. COVID-19 deaths were the strongest predictor of excess mortality, but pneumonia-related deaths showed a significant interaction, suggesting that pneumonia often served as a secondary complication rather than a source of misclassification. Influenza, while statistically significant, had a negative interaction with COVID-19 mortality. This may reflect reduced influenza transmission due to social distancing or potential over-attribution of deaths to influenza during overlapping respiratory illness seasons. Several limitations should be acknowledged. First, mortality reporting lags—ranging from 2 to 8 weeks—introduce uncertainty in the temporal alignment of peaks and variant-specific waves. Additionally, the dataset did not distinguish between influenza-only deaths and those involving co-infections, possibly inflating influenza’s apparent impact. Moreover, home testing and shifts in death attribution practices may have affected both case and death reporting over time, particularly during the Omicron period. Despite these limitations, the findings provide critical insights into how the evolving virology of SARS-CoV-2, combined with public health responses and sociodemographic context, shaped the trajectory of the pandemic in the United States. Importantly, the regional and temporal heterogeneity in mortality reinforces the need for locally tailored strategies, ongoing surveillance, and adaptive public health responses. As new variants emerge, continued investment in vaccine development, equitable healthcare access, and data transparency will be crucial to managing future public health crises.</p>
+<section id="citations" class="level2">
+<h2 class="anchored" data-anchor-id="citations">Citations</h2>
+<ul>
+<li><p>Woolf, S. H., Chapman, D. A., Sabo, R. T., Zimmerman, E. B. (2020). Excess Deaths From COVID-19 and Other Causes, March–July 2020. <em>JAMA</em>. https://doi.org/10.1001/jama.2020.19545</p></li>
+<li><p>Faust, J. S., Du, C., Renton, B., Lin, Z., Krumholz, H. M. (2023). Excess Mortality in the United States During the First Three Years of the COVID-19 Pandemic. <em>Lancet Regional Health – Americas</em>.</p></li>
+<li><p>Johns Hopkins University Coronavirus Resource Center (until its shutdown in 2023). <em>Global and U.S.-specific COVID-19 statistics, including testing, vaccination, and mortality.</em> https://coronavirus.jhu.edu/</p></li>
+<li><p>Our World in Data. <em>Global and U.S.-specific COVID-19 statistics, including testing, vaccination, and mortality.</em> https://ourworldindata.org/coronavirus</p></li>
+<li><p>The New York Times COVID-19 Data Archive. https://github.com/nytimes/covid-19-data</p></li>
+<li><p>Tabatabai, M., Juarez, P. D., Matthews-Juarez, P., Wilus, D. M., Ramesh, A., Alcendor, D. J., Tabatabai, N., &amp; Singh, K. P. (2023). An Analysis of COVID-19 Mortality During the Dominancy of Alpha, Delta, and Omicron in the USA. <em>J Prim Care Community Health</em>, 14, 21501319231170164. https://doi.org/10.1177/21501319231170164. PMID: 37083205; PMCID: PMC10125879.</p></li>
+<li><p>Crankshaw, K. (2023, June 27). The South had highest disability rate among regions in 2021. <em>Census.gov</em>. https://www.census.gov/library/stories/2023/06/disability-rates-higher-in-rural-areas-than-urban-areas.html</p></li>
+</ul>
+</section>
 </section>
 
 </main>
@@ -411,8 +669,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -523,7 +779,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

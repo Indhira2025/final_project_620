@@ -1,0 +1,2 @@
+"0","#colnames(hosp_raw)"
+"0","kable(head(deaths_raw))"

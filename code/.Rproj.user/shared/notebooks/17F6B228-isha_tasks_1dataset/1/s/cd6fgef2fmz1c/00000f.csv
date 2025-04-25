@@ -1,0 +1,7 @@
+"0","# pneumonia_weekly_year <- excess_death %>% mutate(pneumonia_deaths_alone = as.numeric(pneumonia_deaths) - as.numeric(pneumonia_and_covid_19_deaths)) %>% group_by(mmwr_week, year) %>%  summarize(pneumonia_deaths_overall = sum(pneumonia_deaths_alone, na.rm = TRUE), covid_19_deaths = sum(covid_19_deaths, na.rm = TRUE), excess_deaths_total = sum(excess_deaths), expected_total_deaths = sum(expected_deaths),.groups = ""drop"") "
+"0","# pneumonia_weekly_year"
+"0","# "
+"0","# pneumonia_analysis <- left_join(pneumonia_weekly_year, future_weeks,  by = c(""year"", ""mmwr_week"")) %>% mutate(diff = pneumonia_deaths_overall - expected_pneumonia)"
+"0","# "
+"0","# pneumonia_analysis %>% ggplot(aes(x = covid_19_deaths, y = diff)) + geom_point() + labs(x = ""Covid-19 Deaths"", y = ""Excess Pneumonia Mortality"") + theme_minimal() + geom_hline(yintercept = 0, color = ""red"")"
+"0",""

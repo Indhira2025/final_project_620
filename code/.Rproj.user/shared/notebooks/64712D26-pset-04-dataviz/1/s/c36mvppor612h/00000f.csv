@@ -1,0 +1,8 @@
+"0",""
+"0","dat <- dates_and_pop %>%"
+"0","  left_join(cases_wr1, by = c(""state"", ""mmwr_year"", ""mmwr_week"")) %>%"
+"0","  left_join(hosp_wr1, by = c(""region"", ""mmwr_year"", ""mmwr_week"")) %>%"
+"0","  left_join(deaths_wr1, by = c(""state"", ""mmwr_year"", ""mmwr_week"")) %>%"
+"0","  left_join(vax_wr1, by = c(""state"", ""mmwr_year"", ""mmwr_week""))"
+"0",""
+"0","kable(head(dat))"

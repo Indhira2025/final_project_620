@@ -1,0 +1,6 @@
+"0","# ggplot(excess_death, aes(x = week_ending_date, y = percent_change)) + geom_line() + labs(title = ""Excess Deaths (%) by Week"", y = ""% Excess Mortality"", x = ""Week"") + facet_wrap(~state) "
+"0",""
+"0","excess_death <- excess_death %>% "
+"0","  mutate(region = state.region[match(state, state.name)])"
+"0",""
+"0","ggplot(excess_death, aes(x = week_ending_date, y = percent_change, color = region)) + geom_line(alpha = 0.4) + labs(title = ""Excess Deaths (%) by Week and Region"", y = ""% Excess Mortality"", x = ""Week"") +  geom_smooth(se = FALSE, method = ""loess"", span = 0.3, color = ""black"") + theme_minimal()"

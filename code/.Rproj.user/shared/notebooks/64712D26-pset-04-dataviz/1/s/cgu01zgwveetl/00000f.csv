@@ -1,0 +1,8 @@
+"0","library(lubridate)"
+"0","cases_wr1 <- cases_raw %>% "
+"0","  #get date, epiyear, and epiweek "
+"0","   mutate(start_date = as_date(start_date),"
+"0","    mmwr_year = epiyear(start_date),"
+"0","    mmwr_week = epiweek(start_date)) %>%"
+"0","  select(start_date, state, mmwr_year, mmwr_week, cases = new_cases)"
+"0","kable(head(cases_wr1))"

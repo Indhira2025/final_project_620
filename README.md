@@ -1,6 +1,6 @@
 # final_project_620
 
-All code to reproduce data wrangling and analyses are in the folder titled code. (finalproject_v.qmd) 
+All code to reproduce data wrangling and analyses are in the folder titled code. (finalprojectcode.R) 
 
 All plots are in the docs folder. 
 
